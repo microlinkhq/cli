@@ -2,7 +2,7 @@
   "name": "@microlink/cli",
   "description": "A CLI for interacting with Microlink API",
   "homepage": "https://nicedoc.io/microlinkhq/microlink-cli",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "main": "index.js",
   "bin": {
     "microlink-api": "bin/microlink-api",
@@ -105,5 +105,11 @@
     "scripts": {
       "prechangelog": "git-authors-cli"
     }
-  }
+  },
+  "contributors": [
+    {
+      "name": "Kiko Beats",
+      "email": "josefrancisco.verdu@gmail.com"
+    }
+  ]
 }
