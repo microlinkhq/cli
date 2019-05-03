@@ -40,13 +40,20 @@ const print = (payload, { color }) => {
   color ? jsome(payload) : console.log(payload)
 }
 
-const printHeaders = (payload, { headers, ...opts }) => {
-  if (headers) print(payload, opts)
+const printHeaders = (payload, opts) => {
+  if (opts.printHeaders) print(payload, opts)
 }
 
-const printBody = (payload, { body, ...opts }) => {
-  if (body) print(payload, opts)
+const printBody = (payload, opts) => {
+  if (opts.printBody) print(payload, opts)
 }
+
+const getHeaders = headers =>
+  [].concat(headers).reduce((acc, header) => {
+    const [key, value] = header.split(':')
+    acc[key.trim()] = value.trim()
+    return acc
+  }, {})
 
 const main = async endpoint => {
   const cli = meow({
@@ -57,23 +64,26 @@ const main = async endpoint => {
         type: 'boolean',
         default: false
       },
-      headers: {
-        type: Boolean,
+      printHeaders: {
+        type: 'boolean',
         default: true
       },
-      body: {
-        type: Boolean,
+      header: {
+        type: 'string',
+        alias: 'H'
+      },
+      printBody: {
+        type: 'boolean',
         default: true
       },
       color: {
-        type: Boolean,
+        type: 'boolean',
         default: true
       }
     }
   })
 
   let [input] = cli.input
-  const { onlyBody, onlyHeaders, ...flags } = cli.flags
   input = `url=${sanetizeInput(input)}`
 
   const { url, ...opts } = querystring.parse(input)
@@ -82,15 +92,16 @@ const main = async endpoint => {
     encoding: null,
     json: false,
     endpoint,
-    ...flags,
+    throwHttpErrors: cli.flags.throwHttpErrors,
+    headers: getHeaders(cli.flags.header),
     ...opts
   })
 
-  const { headers, body } = response
+  const { body } = response
 
-  printHeaders(headers, cli.flags)
+  printHeaders(response.headers, cli.flags)
 
-  const contentType = headers['content-type'].toLowerCase()
+  const contentType = response.headers['content-type'].toLowerCase()
   const isUTF = contentType.includes('utf')
   if (!isUTF) return termImg(body)
   const isText = contentType.includes('text/plain')
