@@ -93,7 +93,7 @@ const main = async endpoint => {
     json: false,
     endpoint,
     throwHttpErrors: cli.flags.throwHttpErrors,
-    headers: getHeaders(cli.flags.header),
+    headers: cli.flags.header ? getHeaders(cli.flags.header) : undefined,
     ...opts
   })
 
