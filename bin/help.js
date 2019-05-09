@@ -12,7 +12,6 @@ Flags
   ${gray('--print-headers     print response headers. [default=true]')}
   ${gray('--print-body        print response body.    [default=true]')}
   ${gray('--colors            colorize output.        [default=true]')}
-  ${gray('--header, -H        Pass a request header.')}
 
 Examples
   ${gray('microlink-api https://microlink.io&palette')}

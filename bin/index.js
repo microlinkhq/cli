@@ -48,29 +48,14 @@ const printBody = (payload, opts) => {
   if (opts.printBody) print(payload, opts)
 }
 
-const getHeaders = headers =>
-  [].concat(headers).reduce((acc, header) => {
-    const [key, value] = header.split(':')
-    acc[key.trim()] = value.trim()
-    return acc
-  }, {})
-
 const main = async endpoint => {
   const cli = meow({
     description: false,
     help: require('./help'),
     flags: {
-      throwHttpErrors: {
-        type: 'boolean',
-        default: false
-      },
       printHeaders: {
         type: 'boolean',
         default: true
-      },
-      header: {
-        type: 'string',
-        alias: 'H'
       },
       printBody: {
         type: 'boolean',
@@ -88,14 +73,14 @@ const main = async endpoint => {
 
   const { url, ...opts } = querystring.parse(input)
 
-  const { response } = await mql(url, {
+  const mqlOpts = {
     encoding: null,
     json: false,
     endpoint,
-    throwHttpErrors: cli.flags.throwHttpErrors,
-    headers: cli.flags.header ? getHeaders(cli.flags.header) : undefined,
     ...opts
-  })
+  }
+
+  const { response } = await mql(url, mqlOpts)
 
   const { body } = response
 
