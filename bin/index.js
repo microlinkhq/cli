@@ -3,10 +3,12 @@
 'use strict'
 
 const escapeStringRegexp = require('escape-string-regexp')
-const beautyError = require('beauty-error')
+const terminalLink = require('terminal-link')
+const prettyBytes = require('pretty-bytes')
 const querystring = require('querystring')
 const mql = require('@microlink/mql')
 const termImg = require('term-img')
+const chalk = require('chalk')
 const meow = require('meow')
 
 const jsome = require('./jsome')
@@ -25,27 +27,31 @@ const ALL_ENDPOINTS = [
   []
 )
 
-const API_ENDPOINT_REGEX = new RegExp(
-  `^(${ALL_ENDPOINTS.map(endpoint => endpoint).join('|')})`,
-  'i'
-)
+const createEndpointRegex = endpoints =>
+  new RegExp(`^(${endpoints.map(endpoint => endpoint).join('|')})`, 'i')
 
-const sanetizeInput = input =>
-  input
-    .replace(API_ENDPOINT_REGEX, '')
-    .replace(/^\?/i, '')
-    .replace(/^url=/i, '')
+const sanetizeInput = (input, endpoint) => {
+  if (!input) return input
+  const difference = ALL_ENDPOINTS.filter(elem => ![endpoint].includes(elem))
+  const endpointRegex = createEndpointRegex(difference)
+  return input.replace(endpointRegex, endpoint)
+}
 
 const print = (payload, { color }) => {
   color ? jsome(payload) : console.log(payload)
 }
 
-const printHeaders = (payload, opts) => {
-  if (opts.printHeaders) print(payload, opts)
+const printLabel = (text, color) =>
+  chalk.inverse.bold[color](` ${text.toUpperCase()} `)
+
+const pretty = (label, value) => {
+  return value ? label + ' ' + chalk.gray(value) : undefined
 }
 
-const printBody = (payload, opts) => {
-  if (opts.printBody) print(payload, opts)
+const moreLink = (link = '') => {
+  return link.startsWith('mailto')
+    ? terminalLink('Click to report', link)
+    : link
 }
 
 const main = async endpoint => {
@@ -53,11 +59,11 @@ const main = async endpoint => {
     description: false,
     help: require('./help'),
     flags: {
-      printHeaders: {
+      printBody: {
         type: 'boolean',
         default: true
       },
-      printBody: {
+      printResume: {
         type: 'boolean',
         default: true
       },
@@ -68,10 +74,11 @@ const main = async endpoint => {
     }
   })
 
-  let [input] = cli.input
-  input = `url=${sanetizeInput(input)}`
+  let [cliInput] = cli.input
+  const input = sanetizeInput(cliInput, endpoint)
+  const stringifyInput = input.includes(endpoint) ? input : `url=${input}`
 
-  const { url, ...opts } = querystring.parse(input)
+  let { url, ...opts } = querystring.parse(stringifyInput)
 
   const mqlOpts = {
     encoding: null,
@@ -80,22 +87,76 @@ const main = async endpoint => {
     ...opts
   }
 
-  const { response } = await mql(url, mqlOpts)
-
-  const { body } = response
-
-  printHeaders(response.headers, cli.flags)
-
-  const contentType = response.headers['content-type'].toLowerCase()
-  const isUTF = contentType.includes('utf')
-  if (!isUTF) return termImg(body)
-  const isText = contentType.includes('text/plain')
-  const json = JSON.parse(body.toString())
-  printBody(isText ? json.data : json, cli.flags)
+  try {
+    const { response } = await mql(url, mqlOpts)
+    return { ...response, flags: cli.flags }
+  } catch (err) {
+    err.flags = cli.flags
+    throw err
+  }
 }
 
 module.exports = apiEndpoint =>
-  main(apiEndpoint).catch(err => {
-    console.error(beautyError(err))
-    process.exit(1)
-  })
+  main(apiEndpoint)
+    .then(({ body, headers, flags }) => {
+      const contentType = headers['content-type'].toLowerCase()
+      const isUTF = contentType.includes('utf')
+      const isText = contentType.includes('text/plain')
+      const json = JSON.parse(body.toString())
+
+      if (flags.printBody) {
+        if (!isUTF) termImg(body)
+        else print(isText ? json.data : json, flags)
+      }
+
+      if (flags.printResume) {
+        const cache = headers['x-cache-status']
+        const expiredAt =
+          cache === 'HIT' ? `(${headers['x-cache-expired-at']})` : ''
+        const fetchMode = headers['x-fetch-mode']
+        const fetchTime = `(${headers['x-fetch-time']})`
+        const time = headers['x-response-time']
+        const size = Number(headers['content-length'])
+        console.log()
+        console.log(
+          ' ',
+          printLabel('success', 'green'),
+          chalk.gray(`${prettyBytes(size)} in ${time}`)
+        )
+        console.log()
+        console.log(
+          '  ',
+          pretty(chalk.green('cache'), cache),
+          chalk.gray(expiredAt)
+        )
+        console.log(
+          '  ',
+          pretty(chalk.green(' mode'), fetchMode),
+          chalk.gray(fetchTime)
+        )
+      }
+      process.exit(0)
+    })
+    .catch(err => {
+      if (err.flags.printResume) {
+        console.log()
+        console.log(
+          ` `,
+          printLabel((err.status || 'fail').toUpperCase(), 'red'),
+          chalk.gray(err.message.replace(`${err.code}, `, ''))
+        )
+        console.log()
+        err.url && console.log('  ', pretty(chalk.red(' uri'), err.url))
+        console.log(
+          '  ',
+          pretty(
+            chalk.red('code'),
+            `${err.code} ${err.statusCode ? `(${err.statusCode})` : ''}`
+          )
+        )
+        err.more &&
+          console.log('  ', pretty(chalk.red('more'), moreLink(err.more)))
+      }
+
+      process.exit(1)
+    })

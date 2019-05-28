@@ -9,7 +9,7 @@ Usage
   ${gray('$ microlink-[api|pro] <url> [flags]')}
 
 Flags
-  ${gray('--print-headers     print response headers. [default=true]')}
+  ${gray('--print-resume      print response resume.  [default=true]')}
   ${gray('--print-body        print response body.    [default=true]')}
   ${gray('--colors            colorize output.        [default=true]')}
 
