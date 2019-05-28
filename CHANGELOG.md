@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/microlinkhq/microlink-cli/compare/v1.0.5...v1.1.0) (2019-05-28)
+
+
+### Build System
+
+* update dependencies ([84c2814](https://github.com/microlinkhq/microlink-cli/commit/84c2814))
+
+
+### Features
+
+* add resume message ([d7eb65d](https://github.com/microlinkhq/microlink-cli/commit/d7eb65d))
+
+
+
 ### [1.0.5](https://github.com/microlinkhq/microlink-cli/compare/v1.0.4...v1.0.5) (2019-05-20)
 
 
