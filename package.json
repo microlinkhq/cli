@@ -3,7 +3,6 @@
   "description": "A CLI for interacting with Microlink API",
   "homepage": "https://nicedoc.io/microlinkhq/cli",
   "version": "1.1.4",
-  "main": "index.js",
   "bin": {
     "microlink-api": "bin/microlink-api",
     "microlink-dev": "bin/microlink-dev",
@@ -11,10 +10,16 @@
     "microlink-pro": "bin/microlink-pro"
   },
   "author": {
-    "name": "microlink.io",
     "email": "hello@microlink.io",
+    "name": "microlink.io",
     "url": "https://microlink.io"
   },
+  "contributors": [
+    {
+      "name": "Kiko Beats",
+      "email": "josefrancisco.verdu@gmail.com"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/microlinkhq/cli.git"
@@ -42,6 +47,7 @@
   "devDependencies": {
     "@commitlint/cli": "latest",
     "@commitlint/config-conventional": "latest",
+    "ci-publish": "latest",
     "conventional-github-releaser": "latest",
     "finepack": "latest",
     "git-authors-cli": "latest",
@@ -52,12 +58,14 @@
     "prettier-standard": "latest",
     "standard": "latest",
     "standard-markdown": "latest",
-    "standard-version": "latest",
-    "ci-publish": "latest"
+    "standard-version": "latest"
   },
   "engines": {
     "node": ">= 8"
   },
+  "files": [
+    "bin"
+  ],
   "scripts": {
     "clean": "rm -rf node_modules",
     "lint": "standard-markdown README.md && standard",
@@ -101,8 +109,5 @@
         "git add"
       ]
     }
-  },
-  "contributors": [
-    "Kiko Beats <josefrancisco.verdu@gmail.com>"
-  ]
+  }
 }
