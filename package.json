@@ -61,7 +61,7 @@
   "scripts": {
     "clean": "rm -rf node_modules",
     "lint": "standard-markdown README.md && standard",
-    "postrelease": "npm run release:tags && npm run release:github && ci-publish",
+    "postrelease": "npm run release:tags && npm run release:github && ci-publish --access=public",
     "precommit": "lint-staged",
     "prerelease": "npm run update:check",
     "pretest": "npm run lint",
@@ -103,6 +103,9 @@
     }
   },
   "contributors": [
-    "Kiko Beats <josefrancisco.verdu@gmail.com>"
+    {
+      "name": "Kiko Beats",
+      "email": "josefrancisco.verdu@gmail.com"
+    }
   ]
 }
