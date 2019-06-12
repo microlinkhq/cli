@@ -146,6 +146,10 @@ module.exports = apiEndpoint =>
           chalk.gray(err.message.replace(`${err.code}, `, ''))
         )
         console.log()
+        if (err.data) {
+          console.log(pretty('   ', JSON.stringify(err.data)))
+          console.log()
+        }
         err.url && console.log('  ', pretty(chalk.red(' uri'), err.url))
         console.log(
           '  ',
