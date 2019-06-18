@@ -102,11 +102,15 @@ module.exports = apiEndpoint =>
       const contentType = headers['content-type'].toLowerCase()
       const isUTF = contentType.includes('utf')
       const isText = contentType.includes('text/plain')
-      const json = JSON.parse(body.toString())
 
       if (flags.printBody) {
-        if (!isUTF) termImg(body)
-        else print(isText ? json.data : json, flags)
+        if (!isUTF) {
+          console.log()
+          termImg(body)
+        } else {
+          const json = JSON.parse(body.toString())
+          print(isText ? json.data : json, flags)
+        }
       }
 
       if (flags.printResume) {
