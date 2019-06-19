@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.8](https://github.com/microlinkhq/cli/compare/v1.1.7...v1.1.8) (2019-06-19)
+
+
+### Build System
+
+* update travis ([fc1fc94](https://github.com/microlinkhq/cli/commit/fc1fc94))
+
+
+
 ### [1.1.7](https://github.com/microlinkhq/cli/compare/v1.1.6...v1.1.7) (2019-06-18)
 
 
