@@ -8,8 +8,10 @@ const prettyBytes = require('pretty-bytes')
 const querystring = require('querystring')
 const mql = require('@microlink/mql')
 const termImg = require('term-img')
+const temp = require('temperment')
 const chalk = require('chalk')
 const meow = require('meow')
+const fs = require('fs')
 
 const jsome = require('./jsome')
 
@@ -100,16 +102,28 @@ module.exports = apiEndpoint =>
   main(apiEndpoint)
     .then(({ body, headers, flags }) => {
       const contentType = headers['content-type'].toLowerCase()
-      const isUTF = contentType.includes('utf')
-      const isText = contentType.includes('text/plain')
+      const printMode = (() => {
+        if (body.toString().startsWith('data:')) return 'base64'
+        if (!contentType.includes('utf')) return 'image'
+      })()
 
       if (flags.printBody) {
-        if (!isUTF) {
-          console.log()
-          termImg(body)
-        } else {
-          const json = JSON.parse(body.toString())
-          print(isText ? json.data : json, flags)
+        switch (printMode) {
+          case 'base64':
+            const extension = contentType.split('/')[1].split(';')[0]
+            const filepath = temp.file({ extension })
+            fs.writeFileSync(filepath, body.toString().split(',')[1], 'base64')
+            console.log()
+            termImg(filepath)
+            break
+          case 'image':
+            console.log()
+            termImg(body)
+            break
+          default:
+            const isText = contentType.includes('text/plain')
+            print(isText ? body : JSON.parse(body).data, flags)
+            break
         }
       }
 
