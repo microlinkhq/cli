@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.9](https://github.com/microlinkhq/cli/compare/v1.1.8...v1.1.9) (2019-06-30)
+
+
+### Build System
+
+* add base64 support ([8c472b1](https://github.com/microlinkhq/cli/commit/8c472b1))
+
+
+
 ### [1.1.8](https://github.com/microlinkhq/cli/compare/v1.1.7...v1.1.8) (2019-06-19)
 
 
