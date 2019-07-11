@@ -3,17 +3,15 @@
 'use strict'
 
 const escapeStringRegexp = require('escape-string-regexp')
-const terminalLink = require('terminal-link')
-const prettyBytes = require('pretty-bytes')
+
 const querystring = require('querystring')
 const mql = require('@microlink/mql')
-const termImg = require('term-img')
 const temp = require('temperment')
 const chalk = require('chalk')
 const meow = require('meow')
 const fs = require('fs')
 
-const jsome = require('./jsome')
+const print = require('./print')
 
 const ALL_ENDPOINTS = [
   'api.microlink.io',
@@ -37,23 +35,6 @@ const sanetizeInput = (input, endpoint) => {
   const difference = ALL_ENDPOINTS.filter(elem => ![endpoint].includes(elem))
   const endpointRegex = createEndpointRegex(difference)
   return input.replace(endpointRegex, endpoint)
-}
-
-const print = (payload, { color }) => {
-  color ? jsome(payload) : console.log(payload)
-}
-
-const printLabel = (text, color) =>
-  chalk.inverse.bold[color](` ${text.toUpperCase()} `)
-
-const pretty = (label, value) => {
-  return value ? label + ' ' + chalk.gray(value) : undefined
-}
-
-const moreLink = (link = '') => {
-  return link.startsWith('mailto')
-    ? terminalLink('Click to report', link)
-    : link
 }
 
 const main = async endpoint => {
@@ -100,7 +81,7 @@ const main = async endpoint => {
 
 module.exports = apiEndpoint =>
   main(apiEndpoint)
-    .then(({ body, headers, flags }) => {
+    .then(({ url: uri, body, headers, flags }) => {
       const contentType = headers['content-type'].toLowerCase()
       const printMode = (() => {
         if (body.toString().startsWith('data:')) return 'base64'
@@ -114,15 +95,15 @@ module.exports = apiEndpoint =>
             const filepath = temp.file({ extension })
             fs.writeFileSync(filepath, body.toString().split(',')[1], 'base64')
             console.log()
-            termImg(filepath)
+            print.image(filepath)
             break
           case 'image':
             console.log()
-            termImg(body)
+            print.image(body)
             break
           default:
             const isText = contentType.includes('text/plain')
-            print(isText ? body : JSON.parse(body).data, flags)
+            print.json(isText ? body : JSON.parse(body).data, flags)
             break
         }
       }
@@ -130,7 +111,7 @@ module.exports = apiEndpoint =>
       if (flags.printResume) {
         const cache = headers['x-cache-status']
         const expiredAt =
-          cache === 'HIT' ? `(${headers['x-cache-expired-at']})` : ''
+          cache === 'HIT' ? `(${headers['x-cache-expired-at']} left)` : ''
         const fetchMode = headers['x-fetch-mode']
         const fetchTime = `(${headers['x-fetch-time']})`
         const time = headers['x-response-time']
@@ -138,19 +119,24 @@ module.exports = apiEndpoint =>
         console.log()
         console.log(
           ' ',
-          printLabel('success', 'green'),
-          chalk.gray(`${prettyBytes(size)} in ${time}`)
+          print.label('success', 'green'),
+          chalk.gray(`${print.bytes(size)} in ${time}`)
         )
         console.log()
+        console.log('    ', print.keyValue(chalk.green('uri'), uri))
         console.log(
           '  ',
-          pretty(chalk.green('cache'), cache),
-          chalk.gray(expiredAt)
+          print.keyValue(
+            chalk.green('cache'),
+            `${cache} ${chalk.gray(expiredAt)}`
+          )
         )
         console.log(
           '  ',
-          pretty(chalk.green(' mode'), fetchMode),
-          chalk.gray(fetchTime)
+          print.keyValue(
+            chalk.green(' mode'),
+            `${fetchMode} ${chalk.gray(fetchTime)}`
+          )
         )
       }
       process.exit(0)
@@ -160,24 +146,30 @@ module.exports = apiEndpoint =>
         console.log()
         console.log(
           ` `,
-          printLabel((err.status || 'fail').toUpperCase(), 'red'),
+          print.label((err.status || 'fail').toUpperCase(), 'red'),
           chalk.gray(err.message.replace(`${err.code}, `, ''))
         )
         console.log()
         if (err.data) {
-          console.log(pretty('   ', JSON.stringify(err.data)))
+          console.log(print.keyValue('   ', JSON.stringify(err.data)))
           console.log()
         }
-        err.url && console.log('  ', pretty(chalk.red(' uri'), err.url))
+        err.url && console.log('  ', print.keyValue(chalk.red(' uri'), err.url))
         console.log(
           '  ',
-          pretty(
+          print.keyValue(
             chalk.red('code'),
             `${err.code} ${err.statusCode ? `(${err.statusCode})` : ''}`
           )
         )
         err.more &&
-          console.log('  ', pretty(chalk.red('more'), moreLink(err.more)))
+          console.log(
+            '  ',
+            print.keyValue(
+              chalk.red('more'),
+              print.link('Click to report', err.more)
+            )
+          )
       }
 
       process.exit(1)
