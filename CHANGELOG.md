@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/microlinkhq/cli/compare/v1.1.9...v1.2.0) (2019-07-11)
+
+
+### Bug Fixes
+
+* linter ([3336d81](https://github.com/microlinkhq/cli/commit/3336d81))
+
+
+### Build System
+
+* extract print helpers ([934a0cb](https://github.com/microlinkhq/cli/commit/934a0cb))
+* migrate lint-staged ([cede92e](https://github.com/microlinkhq/cli/commit/cede92e))
+
+
+### Features
+
+* add copy flag ([0c31275](https://github.com/microlinkhq/cli/commit/0c31275))
+
+
+
 ### [1.1.9](https://github.com/microlinkhq/cli/compare/v1.1.8...v1.1.9) (2019-06-30)
 
 
