@@ -9,9 +9,10 @@ Usage
   ${gray('$ microlink-[api|pro] <url> [flags]')}
 
 Flags
-  ${gray('--print-resume      print response resume.  [default=true]')}
-  ${gray('--print-body        print response body.    [default=true]')}
-  ${gray('--colors            colorize output.        [default=true]')}
+  ${gray('--print-resume      print response resume.   [default=true]')}
+  ${gray('--print-body        print response body.     [default=true]')}
+  ${gray('--colors            colorize output.         [default=true]')}
+  ${gray('--copy             copy output to clipboard. [default=false]')}
 
 Examples
   ${gray('microlink-api https://microlink.io&palette')}

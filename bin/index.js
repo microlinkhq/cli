@@ -5,6 +5,7 @@
 const escapeStringRegexp = require('escape-string-regexp')
 
 const querystring = require('querystring')
+const clipboardy = require('clipboardy')
 const mql = require('@microlink/mql')
 const temp = require('temperment')
 const chalk = require('chalk')
@@ -53,6 +54,10 @@ const main = async endpoint => {
       color: {
         type: 'boolean',
         default: true
+      },
+      copy: {
+        type: 'boolean',
+        default: false
       }
     }
   })
@@ -139,6 +144,18 @@ module.exports = apiEndpoint =>
           )
         )
       }
+
+      if (flags.copy) {
+        let copiedValue
+        try {
+          copiedValue = JSON.parse(body)
+        } catch (err) {
+          copiedValue = body
+        }
+        clipboardy.writeSync(JSON.stringify(copiedValue, null, 2))
+        console.log(`\n   ${chalk.gray('Copied to clipboard!')}`)
+      }
+
       process.exit(0)
     })
     .catch(err => {
@@ -167,7 +184,7 @@ module.exports = apiEndpoint =>
             '  ',
             print.keyValue(
               chalk.red('more'),
-              print.link('Click to report', err.more)
+              print.link('click to report', err.more)
             )
           )
       }
