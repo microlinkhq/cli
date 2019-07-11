@@ -62,11 +62,11 @@ const main = async endpoint => {
     }
   })
 
-  let [cliInput] = cli.input
+  const [cliInput] = cli.input
   const input = sanetizeInput(cliInput, endpoint)
   const stringifyInput = input.includes(endpoint) ? input : `url=${input}`
 
-  let { url, ...opts } = querystring.parse(stringifyInput)
+  const { url, ...opts } = querystring.parse(stringifyInput)
 
   const mqlOpts = {
     encoding: null,
