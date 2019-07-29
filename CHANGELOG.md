@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.1](https://github.com/microlinkhq/cli/compare/v1.2.0...v1.2.1) (2019-07-29)
+
+
+### Build System
+
+* **deps:** update pretty-bytes requirement from ~5.2.0 to ~5.3.0 ([49b248f](https://github.com/microlinkhq/cli/commit/49b248f))
+* **deps:** update pretty-bytes requirement from ~5.2.0 to ~5.3.0 ([#1](https://github.com/microlinkhq/cli/issues/1)) ([44d3e69](https://github.com/microlinkhq/cli/commit/44d3e69))
+
+
+
 ## [1.2.0](https://github.com/microlinkhq/cli/compare/v1.1.9...v1.2.0) (2019-07-11)
 
 
