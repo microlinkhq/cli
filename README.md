@@ -1,6 +1,6 @@
-<h1 align="center">
+<div align="center">
   <img src="https://cdn.microlink.io/banner/cli.png" alt="microlink logo">
-</h1>
+</div>
 
 ###### [Documentation](docs/api/getting-started/cli) | [Chat](https://microlink.io/chat)
 
