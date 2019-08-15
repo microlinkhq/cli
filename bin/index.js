@@ -10,6 +10,7 @@ const mql = require('@microlink/mql')
 const temp = require('temperment')
 const chalk = require('chalk')
 const meow = require('meow')
+const ora = require('ora')()
 const fs = require('fs')
 
 const print = require('./print')
@@ -76,9 +77,12 @@ const main = async endpoint => {
   }
 
   try {
+    ora.start()
     const { response } = await mql(url, mqlOpts)
+    ora.stop()
     return { ...response, flags: cli.flags }
   } catch (err) {
+    ora.stop()
     err.flags = cli.flags
     throw err
   }
