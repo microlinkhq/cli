@@ -103,16 +103,17 @@ module.exports = apiEndpoint =>
             const extension = contentType.split('/')[1].split(';')[0]
             const filepath = temp.file({ extension })
             fs.writeFileSync(filepath, body.toString().split(',')[1], 'base64')
-            console.log()
             print.image(filepath)
+            console.log()
             break
           case 'image':
-            console.log()
             print.image(body)
+            console.log()
             break
           default:
+            console.log()
             const isText = contentType.includes('text/plain')
-            print.json(isText ? body : JSON.parse(body).data, flags)
+            print.json(isText ? body.toString() : JSON.parse(body).data, flags)
             break
         }
       }
