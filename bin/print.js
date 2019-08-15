@@ -31,7 +31,7 @@ module.exports = {
     return value ? key + ' ' + chalk.gray(value) : undefined
   },
 
-  image: termImg,
+  image: filepath => termImg(filepath, { fallback: () => filepath }),
 
   link: (text, url) => terminalLink(text, url, { fallback: () => url })
 }
