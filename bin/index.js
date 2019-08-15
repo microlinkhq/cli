@@ -108,7 +108,6 @@ module.exports = apiEndpoint =>
             break
           case 'image':
             print.image(body)
-            console.log()
             break
           default:
             console.log()
