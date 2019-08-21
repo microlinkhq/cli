@@ -7,10 +7,11 @@ const escapeStringRegexp = require('escape-string-regexp')
 const querystring = require('querystring')
 const clipboardy = require('clipboardy')
 const mql = require('@microlink/mql')
+const prettyMs = require('pretty-ms')
 const temp = require('temperment')
 const chalk = require('chalk')
 const meow = require('meow')
-const ora = require('ora')()
+const spinner = require('ora')({ text: '', color: 'white' })
 const fs = require('fs')
 
 const print = require('./print')
@@ -76,13 +77,23 @@ const main = async endpoint => {
     ...opts
   }
 
+  const now = Date.now()
+
+  const interval = setInterval(() => {
+    const elapsedTime = Date.now() - now
+    if (elapsedTime > 500) spinner.text = `${prettyMs(elapsedTime)}`
+  }, 50)
+
   try {
-    ora.start()
+    console.log()
+    spinner.start()
     const { response } = await mql(url, mqlOpts)
-    ora.stop()
+    spinner.stop()
+    clearInterval(interval)
     return { ...response, flags: cli.flags }
   } catch (err) {
-    ora.stop()
+    spinner.stop()
+    clearInterval(interval)
     err.flags = cli.flags
     throw err
   }
@@ -104,13 +115,12 @@ module.exports = apiEndpoint =>
             const filepath = temp.file({ extension })
             fs.writeFileSync(filepath, body.toString().split(',')[1], 'base64')
             print.image(filepath)
-            console.log()
             break
           case 'image':
             print.image(body)
+            console.log()
             break
           default:
-            console.log()
             const isText = contentType.includes('text/plain')
             print.json(isText ? body.toString() : JSON.parse(body).data, flags)
             break
@@ -164,7 +174,6 @@ module.exports = apiEndpoint =>
     })
     .catch(err => {
       if (err.flags.printResume) {
-        console.log()
         console.log(
           ` `,
           print.label((err.status || 'fail').toUpperCase(), 'red'),
