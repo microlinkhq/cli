@@ -82,7 +82,7 @@ const main = async endpoint => {
   const interval = setInterval(() => {
     const elapsedTime = Date.now() - now
     if (elapsedTime > 500) spinner.text = `${prettyMs(elapsedTime)}`
-  }, 50)
+  }, 100)
 
   try {
     console.log()
