@@ -73,6 +73,7 @@ const main = async endpoint => {
   const mqlOpts = {
     encoding: null,
     json: false,
+    retry: 0,
     endpoint,
     ...opts
   }
