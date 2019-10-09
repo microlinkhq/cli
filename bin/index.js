@@ -135,7 +135,9 @@ module.exports = apiEndpoint =>
         const fetchMode = headers['x-fetch-mode']
         const fetchTime = `(${headers['x-fetch-time']})`
         const time = headers['x-response-time']
-        const size = Number(headers['content-length'])
+        const size = Number(
+          headers['content-length'] || Buffer.byteLength(response.body)
+        )
         console.log()
         console.log(
           ' ',
