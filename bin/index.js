@@ -136,7 +136,7 @@ module.exports = apiEndpoint =>
         const fetchTime = `(${headers['x-fetch-time']})`
         const time = headers['x-response-time']
         const size = Number(
-          headers['content-length'] || Buffer.byteLength(response.body)
+          headers['content-length'] || Buffer.byteLength(body)
         )
         console.log()
         console.log(
@@ -176,6 +176,7 @@ module.exports = apiEndpoint =>
       process.exit(0)
     })
     .catch(err => {
+      console.log(err)
       if (err.flags.printResume) {
         console.log(
           ` `,
