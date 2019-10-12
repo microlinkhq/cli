@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.9](https://github.com/microlinkhq/cli/compare/v1.3.8...v1.3.9) (2019-10-12)
+
+
+### Bug Fixes
+
+* calculate content length of a buffer ([3516520](https://github.com/microlinkhq/cli/commit/3516520))
+* object path ([af20e8e](https://github.com/microlinkhq/cli/commit/af20e8e))
+
 ### [1.3.8](https://github.com/microlinkhq/cli/compare/v1.3.7...v1.3.8) (2019-10-09)
 
 ### [1.3.7](https://github.com/microlinkhq/cli/compare/v1.3.6...v1.3.7) (2019-10-09)
