@@ -176,7 +176,6 @@ module.exports = apiEndpoint =>
       process.exit(0)
     })
     .catch(err => {
-      console.log(err)
       if (err.flags.printResume) {
         console.log(
           ` `,
