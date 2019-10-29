@@ -111,20 +111,22 @@ module.exports = apiEndpoint =>
 
       if (flags.printBody) {
         switch (printMode) {
-          case 'base64':
+          case 'base64': {
             const extension = contentType.split('/')[1].split(';')[0]
             const filepath = temp.file({ extension })
             fs.writeFileSync(filepath, body.toString().split(',')[1], 'base64')
             print.image(filepath)
             break
+          }
           case 'image':
             print.image(body)
             console.log()
             break
-          default:
+          default: {
             const isText = contentType.includes('text/plain')
             print.json(isText ? body.toString() : JSON.parse(body).data, flags)
             break
+          }
         }
       }
 
@@ -178,7 +180,7 @@ module.exports = apiEndpoint =>
     .catch(err => {
       if (err.flags.printResume) {
         console.log(
-          ` `,
+          ' ',
           print.label((err.status || 'fail').toUpperCase(), 'red'),
           chalk.gray(err.message.replace(`${err.code}, `, ''))
         )
