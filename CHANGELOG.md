@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.13](https://github.com/microlinkhq/cli/compare/v1.3.12...v1.3.13) (2019-10-29)
+
+
+### Bug Fixes
+
+* linter ([7b24d34](https://github.com/microlinkhq/cli/commit/7b24d34))
+
 ### [1.3.12](https://github.com/microlinkhq/cli/compare/v1.3.11...v1.3.12) (2019-10-23)
 
 ### [1.3.11](https://github.com/microlinkhq/cli/compare/v1.3.10...v1.3.11) (2019-10-18)
