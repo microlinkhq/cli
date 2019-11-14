@@ -102,7 +102,7 @@ const main = async endpoint => {
 
 module.exports = apiEndpoint =>
   main(apiEndpoint)
-    .then(({ url: uri, body, headers, flags }) => {
+    .then(({ url: uri, body, headers, flags, id }) => {
       const contentType = headers['content-type'].toLowerCase()
       const printMode = (() => {
         if (body.toString().startsWith('data:')) return 'base64'
@@ -189,6 +189,7 @@ module.exports = apiEndpoint =>
           console.log(print.keyValue('   ', JSON.stringify(err.data)))
           console.log()
         }
+        err.id && console.log('  ', print.keyValue(chalk.red('  id'), err.id))
         err.url && console.log('  ', print.keyValue(chalk.red(' uri'), err.url))
         console.log(
           '  ',
