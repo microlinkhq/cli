@@ -15,7 +15,10 @@
     "url": "https://microlink.io"
   },
   "contributors": [
-    "Kiko Beats <josefrancisco.verdu@gmail.com>"
+    {
+      "name": "Kiko Beats",
+      "email": "josefrancisco.verdu@gmail.com"
+    }
   ],
   "repository": {
     "type": "git",
@@ -34,7 +37,6 @@
     "chalk": "~3.0.0",
     "clipboardy": "~2.1.0",
     "escape-string-regexp": "~2.0.0",
-    "got": "~9.6.0",
     "jsome": "~2.5.0",
     "meow": "~5.0.0",
     "ora": "~4.0.2",
@@ -71,10 +73,8 @@
     "clean": "rm -rf node_modules",
     "lint": "standard-markdown README.md && standard",
     "postrelease": "npm run release:tags && npm run release:github && ci-publish --access=public",
-    "precommit": "lint-staged",
     "prerelease": "npm run update:check",
     "pretest": "npm run lint",
-    "pretty": "prettier-standard index.js {core,test,bin,scripts}/**/*.js --single-quote --print-width 100",
     "release": "git-authors-cli && git add package.json && standard-version -a",
     "release:github": "conventional-github-releaser -p angular",
     "release:tags": "git push --follow-tags origin HEAD:master",

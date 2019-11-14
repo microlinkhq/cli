@@ -2,6 +2,8 @@
 
 'use strict'
 
+require('update-notifier')({ pkg: require('../package.json') }).notify()
+
 const escapeStringRegexp = require('escape-string-regexp')
 
 const querystring = require('querystring')
