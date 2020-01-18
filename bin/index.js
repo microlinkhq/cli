@@ -68,7 +68,12 @@ const main = async endpoint => {
 
   const [cliInput] = cli.input
   const input = sanetizeInput(cliInput, endpoint)
-  const stringifyInput = input.includes(endpoint) ? input : `url=${input}`
+
+  const stringifyInput = (() => {
+    if (input.includes(endpoint)) return input
+    if (input.includes('url=')) return input
+    return `url=${input}`
+  })()
 
   const { url, ...opts } = querystring.parse(stringifyInput)
 
