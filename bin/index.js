@@ -80,7 +80,6 @@ const main = async endpoint => {
   const mqlOpts = {
     encoding: null,
     json: false,
-    retry: 0,
     endpoint,
     ...opts
   }
@@ -96,6 +95,11 @@ const main = async endpoint => {
     console.log()
     spinner.start()
     const { response } = await mql(url, mqlOpts)
+
+    const sanetizeUrl = new URL(response.url)
+    ;['json', 'encoding'].forEach(key => sanetizeUrl.searchParams.delete(key))
+    response.url = sanetizeUrl.toString()
+
     spinner.stop()
     clearInterval(interval)
     return { ...response, flags: cli.flags }
@@ -109,7 +113,7 @@ const main = async endpoint => {
 
 module.exports = apiEndpoint =>
   main(apiEndpoint)
-    .then(({ url: uri, body, headers, flags, id }) => {
+    .then(({ url: uri, body, headers, flags }) => {
       const contentType = headers['content-type'].toLowerCase()
       const printMode = (() => {
         if (body.toString().startsWith('data:')) return 'base64'
