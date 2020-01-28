@@ -5,7 +5,6 @@
 require('update-notifier')({ pkg: require('../package.json') }).notify()
 
 const escapeStringRegexp = require('escape-string-regexp')
-
 const querystring = require('querystring')
 const clipboardy = require('clipboardy')
 const mql = require('@microlink/mql')
@@ -15,6 +14,7 @@ const chalk = require('chalk')
 const meow = require('meow')
 const spinner = require('ora')({ text: '', color: 'white' })
 const fs = require('fs')
+const os = require('os')
 
 const print = require('./print')
 
@@ -35,11 +35,22 @@ const ALL_ENDPOINTS = [
 const createEndpointRegex = endpoints =>
   new RegExp(`^(${endpoints.map(endpoint => endpoint).join('|')})`, 'i')
 
-const sanetizeInput = (input, endpoint) => {
+const normalizeInput = (input, endpoint) => {
   if (!input) return input
   const difference = ALL_ENDPOINTS.filter(elem => ![endpoint].includes(elem))
   const endpointRegex = createEndpointRegex(difference)
   return input.replace(endpointRegex, endpoint)
+}
+
+const prefixInput = (input, endpoint) => {
+  if (input.includes(endpoint)) return input
+  if (input.includes('url=')) return input
+  return `url=${input}`
+}
+
+const getInput = input => {
+  const collection = input.length === 1 ? input[0].split(os.EOL) : input
+  return collection.reduce((acc, item) => acc + item.trim(), '')
 }
 
 const main = async endpoint => {
@@ -66,16 +77,11 @@ const main = async endpoint => {
     }
   })
 
-  const [cliInput] = cli.input
-  const input = sanetizeInput(cliInput, endpoint)
+  const input = getInput(cli.input, endpoint)
+  const normalizedInput = normalizeInput(input, endpoint)
+  const prefixedInput = prefixInput(normalizedInput, endpoint)
 
-  const stringifyInput = (() => {
-    if (input.includes(endpoint)) return input
-    if (input.includes('url=')) return input
-    return `url=${input}`
-  })()
-
-  const { url, ...opts } = querystring.parse(stringifyInput)
+  const { url, ...opts } = querystring.parse(prefixedInput)
 
   const mqlOpts = {
     encoding: null,
