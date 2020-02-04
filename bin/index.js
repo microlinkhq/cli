@@ -84,8 +84,7 @@ const main = async endpoint => {
   const { url, ...opts } = querystring.parse(prefixedInput)
 
   const mqlOpts = {
-    encoding: null,
-    json: false,
+    responseType: 'buffer',
     endpoint,
     ...opts
   }
