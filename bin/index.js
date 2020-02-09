@@ -102,7 +102,9 @@ const main = async endpoint => {
     const { response } = await mql(url, mqlOpts)
 
     const sanetizeUrl = new URL(response.url)
-    ;['json', 'encoding'].forEach(key => sanetizeUrl.searchParams.delete(key))
+    ;['json', 'encoding', 'responseType'].forEach(key =>
+      sanetizeUrl.searchParams.delete(key)
+    )
     response.url = sanetizeUrl.toString()
 
     spinner.stop()
