@@ -166,7 +166,7 @@ module.exports = apiEndpoint =>
           chalk.gray(`${print.bytes(size)} in ${time}`)
         )
         console.log()
-        console.log('    ', print.keyValue(chalk.green('id'), id))
+        console.log('     ', print.keyValue(chalk.green('id'), id))
         console.log('    ', print.keyValue(chalk.green('uri'), uri))
         console.log(
           '  ',
@@ -211,8 +211,8 @@ module.exports = apiEndpoint =>
           console.log(print.keyValue('   ', JSON.stringify(err.data)))
           console.log()
         }
-        id && console.log('  ', print.keyValue(chalk.red('  id'), id))
-        err.url && console.log('  ', print.keyValue(chalk.red(' uri'), err.url))
+        id && console.log('    ', print.keyValue(chalk.red('id'), id))
+        err.url && console.log('   ', print.keyValue(chalk.red('uri'), err.url))
         console.log(
           '  ',
           print.keyValue(
