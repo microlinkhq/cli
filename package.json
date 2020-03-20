@@ -32,7 +32,7 @@
   "dependencies": {
     "@microlink/mql": "~0.6.3",
     "chalk": "~3.0.0",
-    "clipboardy": "~2.2.0",
+    "clipboardy": "~2.3.0",
     "escape-string-regexp": "~2.0.0",
     "jsome": "~2.5.0",
     "meow": "~6.1.0",
