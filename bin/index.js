@@ -80,15 +80,7 @@ const main = async endpoint => {
   const input = getInput(cli.input, endpoint)
   const normalizedInput = normalizeInput(input, endpoint)
   const prefixedInput = prefixInput(normalizedInput, endpoint)
-
   const { url, ...opts } = querystring.parse(prefixedInput)
-
-  const mqlOpts = {
-    responseType: 'buffer',
-    endpoint,
-    ...opts
-  }
-
   const now = Date.now()
 
   const interval = setInterval(() => {
@@ -99,7 +91,7 @@ const main = async endpoint => {
   try {
     console.log()
     spinner.start()
-    const { response } = await mql(url, mqlOpts)
+    const { response } = await mql.buffer(url, { endpoint, ...opts })
 
     const sanetizeUrl = new URL(response.url)
     ;['json', 'encoding', 'responseType'].forEach(key =>
