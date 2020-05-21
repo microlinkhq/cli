@@ -32,14 +32,14 @@ module.exports = {
   },
 
   image: filepath =>
-    termImg(filepath, {
-      fallback: () =>
-        console.log(
+    console.log(
+      termImg(filepath, {
+        fallback: () =>
           `\n${chalk.yellow('  tip:')} ${chalk.gray(
             'use iTerm >=3 to see the image here!'
           )}`
-        )
-    }),
+      })
+    ),
 
   link: (text, url) => terminalLink(text, url, { fallback: () => url })
 }
