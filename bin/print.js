@@ -34,6 +34,7 @@ module.exports = {
   image: filepath =>
     console.log(
       termImg(filepath, {
+        width: '50%',
         fallback: () =>
           `\n${chalk.yellow('  tip:')} ${chalk.gray(
             'use iTerm >=3 to see the image here!'
