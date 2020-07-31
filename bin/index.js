@@ -4,7 +4,9 @@
 
 require('update-notifier')({ pkg: require('../package.json') }).notify()
 
+const spinner = require('ora')({ text: '', color: 'white' })
 const escapeStringRegexp = require('escape-string-regexp')
+const indentString = require('indent-string')
 const querystring = require('querystring')
 const clipboardy = require('clipboardy')
 const mql = require('@microlink/mql')
@@ -12,7 +14,7 @@ const prettyMs = require('pretty-ms')
 const temp = require('temperment')
 const chalk = require('chalk')
 const meow = require('meow')
-const spinner = require('ora')({ text: '', color: 'white' })
+const got = require('got')
 const fs = require('fs')
 const os = require('os')
 
@@ -91,7 +93,12 @@ const main = async endpoint => {
   try {
     console.log()
     spinner.start()
-    const { response } = await mql.buffer(url, { endpoint, ...opts })
+
+    const { response } = await (async () => {
+      if (url) return mql.buffer(url, { endpoint, ...opts })
+      const response = await got(endpoint, opts)
+      return { response }
+    })()
 
     const sanetizeUrl = new URL(response.url)
     ;['json', 'encoding', 'responseType'].forEach(key =>
@@ -144,36 +151,44 @@ module.exports = apiEndpoint =>
       if (flags.printResume) {
         const cache = headers['x-cache-status']
         const expiredAt =
-          cache === 'HIT' ? `(${headers['x-cache-expired-at']} left)` : ''
+          cache === 'HIT' && `(${headers['x-cache-expired-at']} left)`
+
         const fetchMode = headers['x-fetch-mode']
-        const fetchTime = `(${headers['x-fetch-time']})`
+        const fetchTime = fetchMode && `(${headers['x-fetch-time']})`
+
         const time = headers['x-response-time']
         const size = Number(
           headers['content-length'] || Buffer.byteLength(body)
         )
         console.log()
         console.log(
-          ' ',
           print.label('success', 'green'),
           chalk.gray(`${print.bytes(size)} in ${time}`)
         )
         console.log()
-        console.log('     ', print.keyValue(chalk.green('id'), id))
-        console.log('    ', print.keyValue(chalk.green('uri'), uri))
-        console.log(
-          '  ',
-          print.keyValue(
-            chalk.green('cache'),
-            `${cache} ${chalk.gray(expiredAt)}`
+
+        if (cache) {
+          console.log(
+            '',
+            print.keyValue(
+              chalk.green('cache'),
+              `${cache || '-'} ${chalk.gray(expiredAt)}`
+            )
           )
-        )
-        console.log(
-          '  ',
-          print.keyValue(
-            chalk.green(' mode'),
-            `${fetchMode} ${chalk.gray(fetchTime)}`
+        }
+
+        if (fetchMode) {
+          console.log(
+            '',
+            print.keyValue(
+              chalk.green(' mode'),
+              `${fetchMode} ${chalk.gray(fetchTime)}`
+            )
           )
-        )
+        }
+
+        console.log(cache ? '  ' : '', print.keyValue(chalk.green('uri'), uri))
+        console.log(cache ? '   ' : ' ', print.keyValue(chalk.green('id'), id))
       }
 
       if (flags.copy) {

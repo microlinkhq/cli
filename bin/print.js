@@ -27,9 +27,7 @@ module.exports = {
 
   bytes: prettyBytes,
 
-  keyValue: (key, value) => {
-    return value ? key + ' ' + chalk.gray(value) : undefined
-  },
+  keyValue: (key, value) => key + ' ' + chalk.gray(value),
 
   image: filepath =>
     console.log(
