@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.50](https://github.com/microlinkhq/cli/compare/v1.3.49...v1.3.50) (2020-08-08)
+
+
+### Bug Fixes
+
+* linter ([6f32a08](https://github.com/microlinkhq/cli/commit/6f32a08))
+
 ### [1.3.49](https://github.com/microlinkhq/cli/compare/v1.3.48...v1.3.49) (2020-07-20)
 
 ### [1.3.48](https://github.com/microlinkhq/cli/compare/v1.3.47...v1.3.48) (2020-06-26)
