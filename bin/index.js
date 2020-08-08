@@ -59,11 +59,10 @@ const main = async endpoint => {
     description: false,
     help: require('./help'),
     flags: {
-      printBody: {
-        type: 'boolean',
-        default: true
+      apiKey: {
+        default: process.env.MICROLINK_API_KEY
       },
-      printResume: {
+      pretty: {
         type: 'boolean',
         default: true
       },
@@ -79,6 +78,7 @@ const main = async endpoint => {
   })
 
   const input = getInput(cli.input, endpoint)
+  const { pretty, color, copy, ...restOpts } = cli.flags
   const normalizedInput = normalizeInput(input, endpoint)
   const prefixedInput = prefixInput(normalizedInput, endpoint)
   const { url, ...opts } = querystring.parse(prefixedInput)
@@ -94,20 +94,17 @@ const main = async endpoint => {
     spinner.start()
 
     const { response } = await (async () => {
-      if (url) return mql.buffer(url, { endpoint, ...opts })
-      const response = await got(endpoint, opts)
+      const mqlOpts = { ...opts, ...restOpts }
+      if (url) return mql.buffer(url, { endpoint, ...mqlOpts })
+      const response = await got(endpoint, mqlOpts)
       return { response }
     })()
-
-    const sanetizeUrl = new URL(response.url)
-    ;['json', 'encoding', 'responseType'].forEach(key =>
-      sanetizeUrl.searchParams.delete(key)
-    )
-    response.url = sanetizeUrl.toString()
-
     spinner.stop()
     clearInterval(interval)
-    return { ...response, flags: cli.flags }
+    return {
+      ...response,
+      flags: { copy, pretty }
+    }
   } catch (err) {
     spinner.stop()
     clearInterval(interval)
@@ -119,6 +116,8 @@ const main = async endpoint => {
 module.exports = apiEndpoint =>
   main(apiEndpoint)
     .then(({ url: uri, body, headers, flags }) => {
+      if (!flags.pretty) return console.log(body.toString())
+
       const contentType = headers['content-type'].toLowerCase()
       const id = headers['x-request-id']
       const printMode = (() => {
@@ -126,69 +125,63 @@ module.exports = apiEndpoint =>
         if (!contentType.includes('utf')) return 'image'
       })()
 
-      if (flags.printBody) {
-        switch (printMode) {
-          case 'base64': {
-            const extension = contentType.split('/')[1].split(';')[0]
-            const filepath = temp.file({ extension })
-            fs.writeFileSync(filepath, body.toString().split(',')[1], 'base64')
-            print.image(filepath)
-            break
-          }
-          case 'image':
-            print.image(body)
-            console.log()
-            break
-          default: {
-            const isText = contentType.includes('text/plain')
-            print.json(isText ? body.toString() : JSON.parse(body).data, flags)
-            break
-          }
+      switch (printMode) {
+        case 'base64': {
+          const extension = contentType.split('/')[1].split(';')[0]
+          const filepath = temp.file({ extension })
+          fs.writeFileSync(filepath, body.toString().split(',')[1], 'base64')
+          print.image(filepath)
+          break
+        }
+        case 'image':
+          print.image(body)
+          console.log()
+          break
+        default: {
+          const isText = contentType.includes('text/plain')
+          print.json(isText ? body.toString() : JSON.parse(body).data, flags)
+          break
         }
       }
 
-      if (flags.printResume) {
-        const cache = headers['x-cache-status']
-        const expiredAt =
-          cache === 'HIT' && `(${headers['x-cache-expired-at']} left)`
+      const cache = headers['x-cache-status']
+      const expiredAt =
+        cache === 'HIT' && `(${headers['x-cache-expired-at']} left)`
 
-        const fetchMode = headers['x-fetch-mode']
-        const fetchTime = fetchMode && `(${headers['x-fetch-time']})`
+      const fetchMode = headers['x-fetch-mode']
+      const fetchTime = fetchMode && `(${headers['x-fetch-time']})`
 
-        const time = headers['x-response-time']
-        const size = Number(
-          headers['content-length'] || Buffer.byteLength(body)
-        )
-        console.log()
+      const time = headers['x-response-time']
+      const size = Number(headers['content-length'] || Buffer.byteLength(body))
+      console.log()
+      console.log(
+        print.label('success', 'green'),
+        chalk.gray(`${print.bytes(size)} in ${time}`)
+      )
+      console.log()
+
+      if (cache) {
         console.log(
-          print.label('success', 'green'),
-          chalk.gray(`${print.bytes(size)} in ${time}`)
+          '',
+          print.keyValue(
+            chalk.green('cache'),
+            `${cache || '-'} ${chalk.gray(expiredAt)}`
+          )
         )
-        console.log()
-
-        if (cache) {
-          console.log(
-            '',
-            print.keyValue(
-              chalk.green('cache'),
-              `${cache || '-'} ${chalk.gray(expiredAt)}`
-            )
-          )
-        }
-
-        if (fetchMode) {
-          console.log(
-            '',
-            print.keyValue(
-              chalk.green(' mode'),
-              `${fetchMode} ${chalk.gray(fetchTime)}`
-            )
-          )
-        }
-
-        console.log(cache ? '  ' : '', print.keyValue(chalk.green('uri'), uri))
-        console.log(cache ? '   ' : ' ', print.keyValue(chalk.green('id'), id))
       }
+
+      if (fetchMode) {
+        console.log(
+          '',
+          print.keyValue(
+            chalk.green(' mode'),
+            `${fetchMode} ${chalk.gray(fetchTime)}`
+          )
+        )
+      }
+
+      console.log(cache ? '  ' : '', print.keyValue(chalk.green('uri'), uri))
+      console.log(cache ? '   ' : ' ', print.keyValue(chalk.green('id'), id))
 
       if (flags.copy) {
         let copiedValue
@@ -200,9 +193,8 @@ module.exports = apiEndpoint =>
         clipboardy.writeSync(JSON.stringify(copiedValue, null, 2))
         console.log(`\n   ${chalk.gray('Copied to clipboard!')}`)
       }
-
-      process.exit(0)
     })
+    .then(process.exit)
     .catch(err => {
       const id = err.headers && err.headers['x-request-id']
 

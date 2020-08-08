@@ -9,12 +9,16 @@ Usage
   ${gray('$ microlink-[api|pro] <url> [flags]')}
 
 Flags
-  ${gray('--print-resume      print response resume.   [default=true]')}
-  ${gray('--print-body        print response body.     [default=true]')}
-  ${gray('--colors            colorize output.         [default=true]')}
-  ${gray('--copy             copy output to clipboard. [default=false]')}
+  ${gray(
+    '--api-key       authenticate using an API key (default is `$MICROLINK_API_KEY`).'
+  )}
+  ${gray('--colors        colorize output (default is `true`).')}
+  ${gray('--copy          copy output to clipboard (default is `false`).')}
+  ${gray('--pretty        beauty response payload (default is `true`).')}
+
 
 Examples
   ${gray('microlink-api https://microlink.io&palette')}
-  ${gray('microlink-pro https://microlink.io&palette&apiKey=MyApiKey')}
+  ${gray('microlink-api --no-pretty https://microlink.io&palette')}
+  ${gray('microlink-pro --api-key=MyApiKey https://microlink.io&palette')}
 `
