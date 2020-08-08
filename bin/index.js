@@ -6,7 +6,6 @@ require('update-notifier')({ pkg: require('../package.json') }).notify()
 
 const spinner = require('ora')({ text: '', color: 'white' })
 const escapeStringRegexp = require('escape-string-regexp')
-const indentString = require('indent-string')
 const querystring = require('querystring')
 const clipboardy = require('clipboardy')
 const mql = require('@microlink/mql')
