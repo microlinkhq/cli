@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.1](https://github.com/microlinkhq/cli/compare/v1.4.0...v1.4.1) (2020-08-15)
+
+
+### Bug Fixes
+
+* miss expiration value ([a3594da](https://github.com/microlinkhq/cli/commit/a3594da))
+
 ## [1.4.0](https://github.com/microlinkhq/cli/compare/v1.3.51...v1.4.0) (2020-08-08)
 
 
