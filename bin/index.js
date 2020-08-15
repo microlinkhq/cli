@@ -105,11 +105,11 @@ const main = async endpoint => {
       ...response,
       flags: { copy, pretty }
     }
-  } catch (err) {
+  } catch (error) {
     spinner.stop()
     clearInterval(interval)
-    err.flags = cli.flags
-    throw err
+    error.flags = cli.flags
+    throw error
   }
 }
 
@@ -195,38 +195,39 @@ module.exports = apiEndpoint =>
       }
     })
     .then(process.exit)
-    .catch(err => {
-      const id = err.headers && err.headers['x-request-id']
+    .catch(error => {
+      const id = error.headers && error.headers['x-request-id']
 
-      if (err.flags.printResume) {
+      if (error.flags.pretty) {
         console.log(
           ' ',
-          print.label((err.status || 'fail').toUpperCase(), 'red'),
-          chalk.gray(err.message.replace(`${err.code}, `, ''))
+          print.label((error.status || 'fail').toUpperCase(), 'red'),
+          chalk.gray(error.message.replace(`${error.code}, `, ''))
         )
         console.log()
-        if (err.data) {
-          console.log(print.keyValue('   ', JSON.stringify(err.data)))
+        if (error.data) {
+          console.log(print.keyValue('   ', JSON.stringify(error.data)))
           console.log()
         }
         id && console.log('    ', print.keyValue(chalk.red('id'), id))
-        err.url && console.log('   ', print.keyValue(chalk.red('uri'), err.url))
+        error.url &&
+          console.log('   ', print.keyValue(chalk.red('uri'), error.url))
         console.log(
           '  ',
           print.keyValue(
             chalk.red('code'),
-            `${err.code} ${err.statusCode ? `(${err.statusCode})` : ''}`
+            `${error.code} ${error.statusCode ? `(${error.statusCode})` : ''}`
           )
         )
-        err.more &&
+        error.more &&
           console.log(
             '  ',
             print.keyValue(
               chalk.red('more'),
-              print.link('click to report', err.report)
+              print.link('click to report', error.report)
             )
           )
-      }
 
-      process.exit(1)
+        process.exit(1)
+      }
     })
