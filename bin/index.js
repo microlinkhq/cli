@@ -146,7 +146,7 @@ module.exports = apiEndpoint =>
 
       const cache = headers['x-cache-status']
       const expiredAt =
-        cache === 'HIT' && `(${headers['x-cache-expired-at']} left)`
+        cache === 'HIT' ? `(${headers['x-cache-expired-at']} left)` : ''
 
       const fetchMode = headers['x-fetch-mode']
       const fetchTime = fetchMode && `(${headers['x-fetch-time']})`
