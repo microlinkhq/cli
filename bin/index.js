@@ -10,6 +10,7 @@ const querystring = require('querystring')
 const clipboardy = require('clipboardy')
 const mql = require('@microlink/mql')
 const prettyMs = require('pretty-ms')
+const timeSpan = require('time-span')
 const temp = require('temperment')
 const chalk = require('chalk')
 const meow = require('meow')
@@ -113,7 +114,9 @@ const main = async endpoint => {
   }
 }
 
-module.exports = apiEndpoint =>
+module.exports = apiEndpoint => {
+  const time = timeSpan()
+
   main(apiEndpoint)
     .then(({ url: uri, body, headers, flags }) => {
       if (!flags.pretty) return console.log(body.toString())
@@ -150,13 +153,11 @@ module.exports = apiEndpoint =>
 
       const fetchMode = headers['x-fetch-mode']
       const fetchTime = fetchMode && `(${headers['x-fetch-time']})`
-
-      const time = headers['x-response-time']
       const size = Number(headers['content-length'] || Buffer.byteLength(body))
       console.log()
       console.log(
         print.label('success', 'green'),
-        chalk.gray(`${print.bytes(size)} in ${time}`)
+        chalk.gray(`${print.bytes(size)} in ${prettyMs(time.rounded())}`)
       )
       console.log()
 
@@ -231,3 +232,4 @@ module.exports = apiEndpoint =>
         process.exit(1)
       }
     })
+}
