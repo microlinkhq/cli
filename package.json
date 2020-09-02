@@ -15,7 +15,10 @@
     "url": "https://microlink.io"
   },
   "contributors": [
-    "Kiko Beats <josefrancisco.verdu@gmail.com>"
+    {
+      "name": "Kiko Beats",
+      "email": "josefrancisco.verdu@gmail.com"
+    }
   ],
   "repository": {
     "type": "git",
@@ -43,7 +46,6 @@
     "temperment": "~1.0.0",
     "term-img": "~5.0.0",
     "terminal-link": "~2.1.1",
-    "time-span": "~4.0.0",
     "update-notifier": "~4.1.1"
   },
   "devDependencies": {
