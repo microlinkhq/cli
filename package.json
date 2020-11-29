@@ -30,7 +30,7 @@
     "microlink"
   ],
   "dependencies": {
-    "@microlink/mql": "~0.7.8",
+    "@microlink/mql": "~0.7.19",
     "chalk": "~4.1.0",
     "clipboardy": "~2.3.0",
     "escape-string-regexp": "~4.0.0",
@@ -39,11 +39,11 @@
     "meow": "~8.0.0",
     "ora": "~5.1.0",
     "pretty-bytes": "~5.4.1",
-    "pretty-ms": "~7.0.0",
+    "pretty-ms": "~7.0.1",
     "temperment": "~1.0.0",
     "term-img": "~5.0.0",
     "terminal-link": "~2.1.1",
-    "update-notifier": "~5.0.0"
+    "update-notifier": "~5.0.1"
   },
   "devDependencies": {
     "@commitlint/cli": "latest",
