@@ -11,13 +11,21 @@ const clipboardy = require('clipboardy')
 const mql = require('@microlink/mql')
 const prettyMs = require('pretty-ms')
 const temp = require('temperment')
+const createGot = require('got')
 const chalk = require('chalk')
 const meow = require('meow')
-const got = require('got')
 const fs = require('fs')
 const os = require('os')
 
 const print = require('./print')
+
+const GOT_OPTS = {
+  headers: {
+    authorization: process.env.MICROLINK_API_AUTHORIZATION
+  }
+}
+
+const got = createGot.extend(GOT_OPTS)
 
 const ALL_ENDPOINTS = [
   'api.microlink.io',
@@ -95,7 +103,7 @@ const main = async endpoint => {
 
     const { response } = await (async () => {
       const mqlOpts = { ...opts, ...restOpts }
-      if (url) return mql.buffer(url, { endpoint, ...mqlOpts })
+      if (url) return mql.buffer(url, { endpoint, ...mqlOpts }, GOT_OPTS)
       const response = await got(endpoint, mqlOpts)
       return { response }
     })()
