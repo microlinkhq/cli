@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](https://github.com/microlinkhq/cli/compare/v1.4.14...v1.5.0) (2020-12-18)
+
+
+### Features
+
+* update dependencies ([82f03b8](https://github.com/microlinkhq/cli/commit/82f03b87cf4eaff8a93afd798137f3db0965e21b))
+
 ### [1.4.14](https://github.com/microlinkhq/cli/compare/v1.4.13...v1.4.14) (2020-11-29)
 
 ### [1.4.13](https://github.com/microlinkhq/cli/compare/v1.4.12...v1.4.13) (2020-10-30)
