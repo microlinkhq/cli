@@ -159,7 +159,14 @@ module.exports = apiEndpoint => {
           break
         default: {
           const isText = contentType.includes('text/plain')
-          print.json(isText ? body.toString() : JSON.parse(body).data, flags)
+
+          const output = (() => {
+            if (isText) return body.toString()
+            const { data, headers } = JSON.parse(body)
+            return { data, headers }
+          })()
+
+          print.json(output, flags)
           break
         }
       }
