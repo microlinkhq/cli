@@ -135,9 +135,7 @@ const main = async endpoint => {
 module.exports = apiEndpoint => {
   main(apiEndpoint)
     .then(({ body, response, flags }) => {
-      const { headers, timings } = response
-      const { url: uri = apiEndpoint } = body
-
+      const { headers, timings, requestUrl: uri } = response
       if (!flags.pretty) return console.log(body.toString())
       const time = prettyMs(timings.end - timings.start)
       const contentType = headers['content-type'].toLowerCase()
