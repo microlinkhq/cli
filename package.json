@@ -15,7 +15,10 @@
     "url": "https://microlink.io"
   },
   "contributors": [
-    "Kiko Beats <josefrancisco.verdu@gmail.com>"
+    {
+      "name": "Kiko Beats",
+      "email": "josefrancisco.verdu@gmail.com"
+    }
   ],
   "repository": {
     "type": "git",
@@ -30,11 +33,11 @@
     "microlink"
   ],
   "dependencies": {
-    "@microlink/mql": "~0.7.19",
+    "@microlink/mql": "~0.8.0",
     "chalk": "~4.1.0",
     "clipboardy": "~2.3.0",
     "escape-string-regexp": "~4.0.0",
-    "got": "~11.8.0",
+    "got": "~11.8.1",
     "jsome": "~2.5.0",
     "meow": "~8.0.0",
     "ora": "~5.1.0",

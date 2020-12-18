@@ -101,16 +101,27 @@ const main = async endpoint => {
     console.log()
     spinner.start()
 
-    const { response } = await (async () => {
+    const { body, response } = await (async () => {
       const mqlOpts = { ...opts, ...restOpts }
-      if (url) return mql.buffer(url, { endpoint, ...mqlOpts }, GOT_OPTS)
+      if (url) {
+        const { response, body } = await mql.buffer(
+          url,
+          { endpoint, ...mqlOpts },
+          GOT_OPTS
+        )
+
+        return { body, response }
+      }
       const response = await got(endpoint, mqlOpts)
-      return { response }
+      return { response, body: response.body }
     })()
+
     spinner.stop()
     clearInterval(interval)
+
     return {
-      ...response,
+      body,
+      response,
       flags: { copy, pretty }
     }
   } catch (error) {
@@ -123,7 +134,10 @@ const main = async endpoint => {
 
 module.exports = apiEndpoint => {
   main(apiEndpoint)
-    .then(({ url: uri, body, headers, flags, timings }) => {
+    .then(({ body, response, flags }) => {
+      const { headers, timings } = response
+      const { url: uri = apiEndpoint } = body
+
       if (!flags.pretty) return console.log(body.toString())
       const time = prettyMs(timings.end - timings.start)
       const contentType = headers['content-type'].toLowerCase()
