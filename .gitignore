@@ -34,3 +34,5 @@ coverage
 ############################
 .env
 .envrc
+bin/microlink-dev
+bin/microlink-next

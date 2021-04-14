@@ -13,7 +13,6 @@ const prettyMs = require('pretty-ms')
 const temp = require('temperment')
 const createGot = require('got')
 const chalk = require('chalk')
-const meow = require('meow')
 const fs = require('fs')
 const os = require('os')
 
@@ -44,7 +43,7 @@ const ALL_ENDPOINTS = [
 const createEndpointRegex = endpoints =>
   new RegExp(`^(${endpoints.map(endpoint => endpoint).join('|')})`, 'i')
 
-const normalizeInput = (input, endpoint) => {
+const sanetizeInput = (input, endpoint) => {
   if (!input) return input
   const difference = ALL_ENDPOINTS.filter(elem => ![endpoint].includes(elem))
   const endpointRegex = createEndpointRegex(difference)
@@ -62,33 +61,11 @@ const getInput = input => {
   return collection.reduce((acc, item) => acc + item.trim(), '')
 }
 
-const main = async endpoint => {
-  const cli = meow({
-    description: false,
-    help: require('./help'),
-    flags: {
-      apiKey: {
-        default: process.env.MICROLINK_API_KEY
-      },
-      pretty: {
-        type: 'boolean',
-        default: true
-      },
-      color: {
-        type: 'boolean',
-        default: true
-      },
-      copy: {
-        type: 'boolean',
-        default: false
-      }
-    }
-  })
-
+const main = async cli => {
+  const { pretty, color, copy, endpoint, ...restOpts } = cli.flags
   const input = getInput(cli.input, endpoint)
-  const { pretty, color, copy, ...restOpts } = cli.flags
-  const normalizedInput = normalizeInput(input, endpoint)
-  const prefixedInput = prefixInput(normalizedInput, endpoint)
+  const sanetizedInput = sanetizeInput(input, endpoint)
+  const prefixedInput = prefixInput(sanetizedInput, endpoint)
   const { url, ...opts } = querystring.parse(prefixedInput)
   const now = Date.now()
 
