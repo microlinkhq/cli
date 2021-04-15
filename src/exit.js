@@ -4,9 +4,9 @@ const chalk = require('chalk')
 
 const print = require('./print')
 
-module.exports = async (pendingPromise, { flags }) => {
+module.exports = async (promise, { flags }) => {
   try {
-    await pendingPromise
+    await promise
     process.exit()
   } catch (error) {
     console.log(error)
@@ -26,13 +26,14 @@ module.exports = async (pendingPromise, { flags }) => {
       id && console.log('    ', print.keyValue(chalk.red('id'), id))
       error.url &&
         console.log('   ', print.keyValue(chalk.red('uri'), error.url))
-      console.log(
-        '  ',
-        print.keyValue(
-          chalk.red('code'),
-          `${error.code} ${error.statusCode ? `(${error.statusCode})` : ''}`
+      error.code &&
+        console.log(
+          '  ',
+          print.keyValue(
+            chalk.red('code'),
+            `${error.code} ${error.statusCode ? `(${error.statusCode})` : ''}`
+          )
         )
-      )
       error.more &&
         console.log(
           '  ',
