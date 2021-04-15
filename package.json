@@ -1,13 +1,10 @@
 {
   "name": "@microlink/cli",
-  "description": "A CLI for interacting with Microlink API",
+  "description": "Interacting with Microlink API from your terminal.",
   "homepage": "https://nicedoc.io/microlinkhq/cli",
   "version": "1.5.8",
   "bin": {
-    "microlink-api": "bin/microlink-api",
-    "microlink-dev": "bin/microlink-dev",
-    "microlink-next": "bin/microlink-next",
-    "microlink-pro": "bin/microlink-pro"
+    "microlink": "bin/microlink"
   },
   "author": {
     "email": "hello@microlink.io",
@@ -37,12 +34,14 @@
     "chalk": "~4.1.0",
     "clipboardy": "~2.3.0",
     "escape-string-regexp": "~4.0.0",
+    "execa": "~5.0.0",
     "got": "~11.8.2",
     "jsome": "~2.5.0",
     "meow": "~9.0.0",
     "ora": "~5.4.0",
     "pretty-bytes": "~5.6.0",
     "pretty-ms": "~7.0.1",
+    "resolve-up": "~1.0.0",
     "temperment": "~1.0.0",
     "term-img": "~5.0.0",
     "terminal-link": "~2.1.1",
@@ -68,7 +67,8 @@
     "node": ">= 8"
   },
   "files": [
-    "bin"
+    "bin",
+    "src"
   ],
   "scripts": {
     "clean": "rm -rf node_modules",
