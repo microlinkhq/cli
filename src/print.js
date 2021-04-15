@@ -2,9 +2,11 @@
 
 const terminalLink = require('terminal-link')
 const prettyBytes = require('pretty-bytes')
+const prettyMs = require('pretty-ms')
 const termImg = require('term-img')
 const jsome = require('jsome')
 const chalk = require('chalk')
+const ora = require('ora')
 
 jsome.colors = {
   num: 'cyan',
@@ -20,6 +22,28 @@ jsome.colors = {
 }
 
 module.exports = {
+  spinner: (text = '') => {
+    const spinner = ora({ color: 'white', text })
+    const now = Date.now()
+    const elapsedTime = () => Date.now() - now
+    let interval
+
+    const start = () => {
+      interval = setInterval(() => {
+        const duration = elapsedTime()
+        if (duration > 500) spinner.text = `${prettyMs(duration)} ${text}`
+      }, 100)
+      spinner.start()
+    }
+
+    const stop = () => {
+      spinner.stop()
+      clearInterval(interval)
+      return elapsedTime()
+    }
+
+    return { start, stop }
+  },
   json: (payload, { color: colorize = true } = {}) =>
     colorize ? jsome(payload) : console.log(payload),
 

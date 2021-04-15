@@ -4,7 +4,6 @@
 
 require('update-notifier')({ pkg: require('../package.json') }).notify()
 
-const spinner = require('ora')({ text: '', color: 'white' })
 const escapeStringRegexp = require('escape-string-regexp')
 const querystring = require('querystring')
 const clipboardy = require('clipboardy')
@@ -17,6 +16,7 @@ const fs = require('fs')
 const os = require('os')
 
 const print = require('./print')
+const exit = require('./exit')
 
 const GOT_OPTS = {
   headers: {
@@ -61,18 +61,13 @@ const getInput = input => {
   return collection.reduce((acc, item) => acc + item.trim(), '')
 }
 
-const main = async cli => {
+const fetch = async cli => {
   const { pretty, color, copy, endpoint, ...restOpts } = cli.flags
   const input = getInput(cli.input, endpoint)
   const sanetizedInput = sanetizeInput(input, endpoint)
   const prefixedInput = prefixInput(sanetizedInput, endpoint)
   const { url, ...opts } = querystring.parse(prefixedInput)
-  const now = Date.now()
-
-  const interval = setInterval(() => {
-    const elapsedTime = Date.now() - now
-    if (elapsedTime > 500) spinner.text = `${prettyMs(elapsedTime)}`
-  }, 100)
+  const spinner = print.spinner()
 
   try {
     console.log()
@@ -94,137 +89,92 @@ const main = async cli => {
     })()
 
     spinner.stop()
-    clearInterval(interval)
-
-    return {
-      body,
-      response,
-      flags: { copy, pretty }
-    }
+    return { body, response, flags: { copy, pretty } }
   } catch (error) {
     spinner.stop()
-    clearInterval(interval)
     error.flags = cli.flags
     throw error
   }
 }
 
-module.exports = apiEndpoint => {
-  main(apiEndpoint)
-    .then(({ body, response, flags }) => {
-      const { headers, timings, requestUrl: uri } = response
-      if (!flags.pretty) return console.log(body.toString())
-      const time = prettyMs(timings.end - timings.start)
-      const contentType = headers['content-type'].toLowerCase()
-      const id = headers['x-request-id']
-      const printMode = (() => {
-        if (body.toString().startsWith('data:')) return 'base64'
-        if (!contentType.includes('utf')) return 'image'
-      })()
+const render = ({ body, response, flags }) => {
+  const { headers, timings, requestUrl: uri } = response
+  if (!flags.pretty) return console.log(body.toString())
+  const time = prettyMs(timings.end - timings.start)
+  const contentType = headers['content-type'].toLowerCase()
+  const id = headers['x-request-id']
+  const printMode = (() => {
+    if (body.toString().startsWith('data:')) return 'base64'
+    if (!contentType.includes('utf')) return 'image'
+  })()
 
-      switch (printMode) {
-        case 'base64': {
-          const extension = contentType.split('/')[1].split(';')[0]
-          const filepath = temp.file({ extension })
-          fs.writeFileSync(filepath, body.toString().split(',')[1], 'base64')
-          print.image(filepath)
-          break
-        }
-        case 'image':
-          print.image(body)
-          console.log()
-          break
-        default: {
-          const isText = contentType.includes('text/plain')
-          const output = isText ? body.toString() : JSON.parse(body)
-          print.json(output, flags)
-          break
-        }
-      }
-
-      const cache = headers['x-cache-status']
-      const expiredAt =
-        cache === 'HIT' ? `(${headers['x-cache-expired-at']} left)` : ''
-
-      const fetchMode = headers['x-fetch-mode']
-      const fetchTime = fetchMode && `(${headers['x-fetch-time']})`
-      const size = Number(headers['content-length'] || Buffer.byteLength(body))
+  switch (printMode) {
+    case 'base64': {
+      const extension = contentType.split('/')[1].split(';')[0]
+      const filepath = temp.file({ extension })
+      fs.writeFileSync(filepath, body.toString().split(',')[1], 'base64')
+      print.image(filepath)
+      break
+    }
+    case 'image':
+      print.image(body)
       console.log()
-      console.log(
-        print.label('success', 'green'),
-        chalk.gray(`${print.bytes(size)} in ${time}`)
+      break
+    default: {
+      const isText = contentType.includes('text/plain')
+      const output = isText ? body.toString() : JSON.parse(body)
+      print.json(output, flags)
+      break
+    }
+  }
+
+  const cache = headers['x-cache-status']
+  const expiredAt =
+    cache === 'HIT' ? `(${headers['x-cache-expired-at']} left)` : ''
+
+  const fetchMode = headers['x-fetch-mode']
+  const fetchTime = fetchMode && `(${headers['x-fetch-time']})`
+  const size = Number(headers['content-length'] || Buffer.byteLength(body))
+  console.log()
+  console.log(
+    print.label('success', 'green'),
+    chalk.gray(`${print.bytes(size)} in ${time}`)
+  )
+  console.log()
+
+  if (cache) {
+    console.log(
+      '',
+      print.keyValue(
+        chalk.green('cache'),
+        `${cache || '-'} ${chalk.gray(expiredAt)}`
       )
-      console.log()
+    )
+  }
 
-      if (cache) {
-        console.log(
-          '',
-          print.keyValue(
-            chalk.green('cache'),
-            `${cache || '-'} ${chalk.gray(expiredAt)}`
-          )
-        )
-      }
+  if (fetchMode) {
+    console.log(
+      '',
+      print.keyValue(
+        chalk.green(' mode'),
+        `${fetchMode} ${chalk.gray(fetchTime)}`
+      )
+    )
+  }
 
-      if (fetchMode) {
-        console.log(
-          '',
-          print.keyValue(
-            chalk.green(' mode'),
-            `${fetchMode} ${chalk.gray(fetchTime)}`
-          )
-        )
-      }
+  console.log(cache ? '  ' : '', print.keyValue(chalk.green('uri'), uri))
+  console.log(cache ? '   ' : ' ', print.keyValue(chalk.green('id'), id))
 
-      console.log(cache ? '  ' : '', print.keyValue(chalk.green('uri'), uri))
-      console.log(cache ? '   ' : ' ', print.keyValue(chalk.green('id'), id))
-
-      if (flags.copy) {
-        let copiedValue
-        try {
-          copiedValue = JSON.parse(body)
-        } catch (err) {
-          copiedValue = body
-        }
-        clipboardy.writeSync(JSON.stringify(copiedValue, null, 2))
-        console.log(`\n   ${chalk.gray('Copied to clipboard!')}`)
-      }
-    })
-    .then(process.exit)
-    .catch(error => {
-      const id = error.headers && error.headers['x-request-id']
-
-      if (error.flags.pretty) {
-        console.log(
-          ' ',
-          print.label((error.status || 'fail').toUpperCase(), 'red'),
-          chalk.gray(error.message.replace(`${error.code}, `, ''))
-        )
-        console.log()
-        if (error.data) {
-          console.log(print.keyValue('   ', JSON.stringify(error.data)))
-          console.log()
-        }
-        id && console.log('    ', print.keyValue(chalk.red('id'), id))
-        error.url &&
-          console.log('   ', print.keyValue(chalk.red('uri'), error.url))
-        console.log(
-          '  ',
-          print.keyValue(
-            chalk.red('code'),
-            `${error.code} ${error.statusCode ? `(${error.statusCode})` : ''}`
-          )
-        )
-        error.more &&
-          console.log(
-            '  ',
-            print.keyValue(
-              chalk.red('more'),
-              print.link('click to report', error.report)
-            )
-          )
-
-        process.exit(1)
-      }
-    })
+  if (flags.copy) {
+    let copiedValue
+    try {
+      copiedValue = JSON.parse(body)
+    } catch (err) {
+      copiedValue = body
+    }
+    clipboardy.writeSync(JSON.stringify(copiedValue, null, 2))
+    console.log(`\n   ${chalk.gray('Copied to clipboard!')}`)
+  }
 }
+
+module.exports = cli => exit(fetch(cli).then(render), cli)
