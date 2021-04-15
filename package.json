@@ -2,7 +2,7 @@
   "name": "@microlink/cli",
   "description": "Interacting with Microlink API from your terminal.",
   "homepage": "https://nicedoc.io/microlinkhq/cli",
-  "version": "1.5.8",
+  "version": "2.0.0-0.0",
   "bin": {
     "microlink": "bin/microlink"
   },
