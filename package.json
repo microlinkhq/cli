@@ -44,7 +44,7 @@
     "resolve-up": "~1.0.0",
     "temperment": "~1.0.0",
     "term-img": "~5.0.0",
-    "terminal-link": "~2.1.1",
+    "terminal-link": "~3.0.0",
     "update-notifier": "~5.1.0"
   },
   "devDependencies": {
