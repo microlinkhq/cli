@@ -33,7 +33,7 @@
     "@microlink/mql": "~0.9.3",
     "chalk": "~4.1.0",
     "clipboardy": "~2.3.0",
-    "escape-string-regexp": "~4.0.0",
+    "escape-string-regexp": "~5.0.0",
     "execa": "~5.0.0",
     "got": "~11.8.2",
     "jsome": "~2.5.0",
