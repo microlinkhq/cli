@@ -1,16 +1,6 @@
 #!/usr/bin/env node
 
-const fs = require('fs')
-
 const cli = require('../src/cli')
-
-const isFile = path => {
-  try {
-    return fs.statSync(path).isFile()
-  } catch (_) {
-    return false
-  }
-}
 
 if (cli.input.length === 0) cli.showHelp()
 require('../src/api')(cli)
