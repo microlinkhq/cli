@@ -3,6 +3,7 @@
   "description": "Interacting with Microlink API from your terminal.",
   "homepage": "https://nicedoc.io/microlinkhq/cli",
   "version": "2.0.0-1.0",
+  "main": "src/index.js",
   "bin": {
     "microlink": "bin/microlink"
   },
@@ -34,7 +35,6 @@
     "chalk": "~4.1.0",
     "clipboardy": "~2.3.0",
     "escape-string-regexp": "~4.0.0",
-    "execa": "~5.0.0",
     "got": "~11.8.2",
     "jsome": "~2.5.0",
     "meow": "~9.0.0",
