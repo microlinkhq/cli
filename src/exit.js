@@ -9,7 +9,6 @@ module.exports = async (promise, { flags }) => {
     await promise
     process.exit()
   } catch (error) {
-    console.log(error)
     const id = error.headers && error.headers['x-request-id']
 
     if (flags.pretty) {
