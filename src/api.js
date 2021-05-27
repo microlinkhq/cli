@@ -84,7 +84,11 @@ const fetch = async cli => {
 
         return { body, response }
       }
-      const response = await got(endpoint, mqlOpts)
+
+      const { apiKey } = mqlOpts
+      const response = await got(endpoint, {
+        headers: apiKey ? { 'x-api-key': apiKey } : undefined
+      })
       return { response, body: response.body }
     })()
 
