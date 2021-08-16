@@ -38,7 +38,7 @@ module.exports = async (promise, { flags }) => {
           '  ',
           print.keyValue(
             chalk.red('more'),
-            print.link('click to report', error.report)
+            print.link('click to report', error.more)
           )
         )
 
