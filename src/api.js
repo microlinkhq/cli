@@ -132,7 +132,14 @@ const render = ({ body, response, flags }) => {
     }
   }
 
-  const cacheStatus = headers['cf-cache-status'] || headers['x-cache-status']
+  const edgeCacheStatus = headers['cf-cache-status']
+  const unifiedCacheStatus = headers['x-cache-status']
+
+  const cacheStatus =
+    unifiedCacheStatus === 'MISS' && edgeCacheStatus === 'HIT'
+      ? edgeCacheStatus
+      : unifiedCacheStatus
+
   const timestamp = Number(headers['x-timestamp'])
   const ttl = Number(headers['x-cache-ttl'])
   const expires = timestamp + ttl - Date.now()
