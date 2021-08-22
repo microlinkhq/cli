@@ -132,10 +132,12 @@ const render = ({ body, response, flags }) => {
     }
   }
 
-  const cache = headers['x-cache-status']
-  const expiredAt =
-    cache === 'HIT' ? `(${headers['x-cache-expired-at']} left)` : ''
-
+  const cacheStatus = headers['cf-cache-status'] || headers['x-cache-status']
+  const timestamp = Number(headers['x-timestamp'])
+  const ttl = Number(headers['x-cache-ttl'])
+  const expires = timestamp + ttl - Date.now()
+  const expiration = prettyMs(expires)
+  const expiredAt = cacheStatus === 'HIT' ? `(${expiration})` : ''
   const fetchMode = headers['x-fetch-mode']
   const fetchTime = fetchMode && `(${headers['x-fetch-time']})`
   const size = Number(headers['content-length'] || Buffer.byteLength(body))
@@ -146,12 +148,12 @@ const render = ({ body, response, flags }) => {
   )
   console.log()
 
-  if (cache) {
+  if (cacheStatus) {
     console.log(
       '',
       print.keyValue(
         chalk.green('cache'),
-        `${cache || '-'} ${chalk.gray(expiredAt)}`
+        `${cacheStatus || '-'} ${chalk.gray(expiredAt)}`
       )
     )
   }
@@ -166,8 +168,8 @@ const render = ({ body, response, flags }) => {
     )
   }
 
-  console.log(cache ? '  ' : '', print.keyValue(chalk.green('uri'), uri))
-  console.log(cache ? '   ' : ' ', print.keyValue(chalk.green('id'), id))
+  console.log(cacheStatus ? '  ' : '', print.keyValue(chalk.green('uri'), uri))
+  console.log(cacheStatus ? '   ' : ' ', print.keyValue(chalk.green('id'), id))
 
   if (flags.copy) {
     let copiedValue
