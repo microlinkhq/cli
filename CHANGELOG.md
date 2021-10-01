@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.6](https://github.com/microlinkhq/cli/compare/v2.0.5...v2.0.6) (2021-10-01)
+
 ### [2.0.5](https://github.com/microlinkhq/cli/compare/v2.0.4...v2.0.5) (2021-08-22)
 
 ### [2.0.4](https://github.com/microlinkhq/cli/compare/v2.0.3...v2.0.4) (2021-08-22)
