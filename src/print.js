@@ -3,9 +3,9 @@
 const terminalLink = require('terminal-link')
 const prettyBytes = require('pretty-bytes')
 const prettyMs = require('pretty-ms')
+const colors = require('picocolors')
 const termImg = require('term-img')
 const jsome = require('jsome')
-const chalk = require('chalk')
 const ora = require('ora')
 
 jsome.colors = {
@@ -47,18 +47,19 @@ module.exports = {
   json: (payload, { color: colorize = true } = {}) =>
     colorize ? jsome(payload) : console.log(payload),
 
-  label: (text, color) => chalk.inverse.bold[color](` ${text.toUpperCase()} `),
+  label: (text, color) =>
+    colors.inverse(colors.bold(colors[color](` ${text.toUpperCase()} `))),
 
   bytes: prettyBytes,
 
-  keyValue: (key, value) => key + ' ' + chalk.gray(value),
+  keyValue: (key, value) => key + ' ' + colors.gray(value),
 
   image: filepath =>
     console.log(
       termImg(filepath, {
         width: '50%',
         fallback: () =>
-          `\n${chalk.yellow('  tip:')} ${chalk.gray(
+          `\n${colors.yellow('  tip:')} ${colors.gray(
             'use iTerm >=3 to see the image here!'
           )}`
       })

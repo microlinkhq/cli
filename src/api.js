@@ -9,9 +9,9 @@ const querystring = require('querystring')
 const clipboardy = require('clipboardy')
 const mql = require('@microlink/mql')
 const prettyMs = require('pretty-ms')
+const colors = require('picocolors')
 const temp = require('temperment')
 const createGot = require('got')
-const chalk = require('chalk')
 const fs = require('fs')
 const os = require('os')
 
@@ -151,7 +151,7 @@ const render = ({ body, response, flags }) => {
   console.log()
   console.log(
     print.label('success', 'green'),
-    chalk.gray(`${print.bytes(size)} in ${time}`)
+    colors.gray(`${print.bytes(size)} in ${time}`)
   )
   console.log()
 
@@ -159,8 +159,8 @@ const render = ({ body, response, flags }) => {
     console.log(
       '',
       print.keyValue(
-        chalk.green('cache'),
-        `${cacheStatus || '-'} ${chalk.gray(expiredAt)}`
+        colors.green('cache'),
+        `${cacheStatus || '-'} ${colors.gray(expiredAt)}`
       )
     )
   }
@@ -169,14 +169,14 @@ const render = ({ body, response, flags }) => {
     console.log(
       '',
       print.keyValue(
-        chalk.green(' mode'),
-        `${fetchMode} ${chalk.gray(fetchTime)}`
+        colors.green(' mode'),
+        `${fetchMode} ${colors.gray(fetchTime)}`
       )
     )
   }
 
-  console.log(cacheStatus ? '  ' : '', print.keyValue(chalk.green('uri'), uri))
-  console.log(cacheStatus ? '   ' : ' ', print.keyValue(chalk.green('id'), id))
+  console.log(cacheStatus ? '  ' : '', print.keyValue(colors.green('uri'), uri))
+  console.log(cacheStatus ? '   ' : ' ', print.keyValue(colors.green('id'), id))
 
   if (flags.copy) {
     let copiedValue
@@ -186,7 +186,7 @@ const render = ({ body, response, flags }) => {
       copiedValue = body
     }
     clipboardy.writeSync(JSON.stringify(copiedValue, null, 2))
-    console.log(`\n   ${chalk.gray('Copied to clipboard!')}`)
+    console.log(`\n   ${colors.gray('Copied to clipboard!')}`)
   }
 }
 

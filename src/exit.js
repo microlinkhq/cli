@@ -1,6 +1,6 @@
 'use strict'
 
-const chalk = require('chalk')
+const colors = require('picocolors')
 
 const print = require('./print')
 
@@ -15,21 +15,21 @@ module.exports = async (promise, { flags }) => {
       console.log(
         ' ',
         print.label((error.status || 'fail').toUpperCase(), 'red'),
-        chalk.gray(error.message.replace(`${error.code}, `, ''))
+        colors.gray(error.message.replace(`${error.code}, `, ''))
       )
       console.log()
       if (error.data) {
         console.log(print.keyValue('   ', JSON.stringify(error.data)))
         console.log()
       }
-      id && console.log('    ', print.keyValue(chalk.red('id'), id))
+      id && console.log('    ', print.keyValue(colors.red('id'), id))
       error.url &&
-        console.log('   ', print.keyValue(chalk.red('uri'), error.url))
+        console.log('   ', print.keyValue(colors.red('uri'), error.url))
       error.code &&
         console.log(
           '  ',
           print.keyValue(
-            chalk.red('code'),
+            colors.red('code'),
             `${error.code} ${error.statusCode ? `(${error.statusCode})` : ''}`
           )
         )
@@ -37,7 +37,7 @@ module.exports = async (promise, { flags }) => {
         console.log(
           '  ',
           print.keyValue(
-            chalk.red('more'),
+            colors.red('more'),
             print.link('click to report', error.more)
           )
         )
