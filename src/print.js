@@ -1,12 +1,12 @@
 'use strict'
 
+const { createSpinner } = require('nanospinner')
 const terminalLink = require('terminal-link')
 const prettyBytes = require('pretty-bytes')
 const prettyMs = require('pretty-ms')
 const colors = require('picocolors')
 const termImg = require('term-img')
 const jsome = require('jsome')
-const ora = require('ora')
 
 jsome.colors = {
   num: 'cyan',
@@ -23,7 +23,7 @@ jsome.colors = {
 
 module.exports = {
   spinner: (text = '') => {
-    const spinner = ora({ color: 'white', text })
+    const spinner = createSpinner(text, { color: 'white' })
     const now = Date.now()
     const elapsedTime = () => Date.now() - now
     let interval
@@ -31,13 +31,15 @@ module.exports = {
     const start = () => {
       interval = setInterval(() => {
         const duration = elapsedTime()
-        if (duration > 500) spinner.text = `${prettyMs(duration)} ${text}`
+        if (duration > 500) {
+          spinner.update({ text: `${prettyMs(duration)} ${text}` })
+        }
       }, 100)
       spinner.start()
     }
 
     const stop = () => {
-      spinner.stop()
+      spinner.clear()
       clearInterval(interval)
       return elapsedTime()
     }
