@@ -11,20 +11,12 @@ const mql = require('@microlink/mql')
 const prettyMs = require('pretty-ms')
 const colors = require('picocolors')
 const temp = require('temperment')
-const createGot = require('got')
+const got = require('got')
 const fs = require('fs')
 const os = require('os')
 
 const print = require('./print')
 const exit = require('./exit')
-
-const GOT_OPTS = {
-  headers: {
-    authorization: process.env.MICROLINK_API_AUTHORIZATION
-  }
-}
-
-const got = createGot.extend(GOT_OPTS)
 
 const ALL_ENDPOINTS = [
   'api.microlink.io',
@@ -61,12 +53,13 @@ const getInput = input => {
   return collection.reduce((acc, item) => acc + item.trim(), '')
 }
 
-const fetch = async cli => {
-  const { pretty, color, copy, endpoint, ...restOpts } = cli.flags
+const fetch = async (cli, gotOpts) => {
+  const { pretty, color, copy, endpoint, ...flags } = cli.flags
   const input = getInput(cli.input, endpoint)
   const sanetizedInput = sanetizeInput(input, endpoint)
   const prefixedInput = prefixInput(sanetizedInput, endpoint)
-  const { url, ...opts } = querystring.parse(prefixedInput)
+  const { url, ...queryParams } = querystring.parse(prefixedInput)
+  const mqlOpts = { endpoint, ...queryParams, ...flags }
   const spinner = print.spinner()
 
   try {
@@ -74,21 +67,12 @@ const fetch = async cli => {
     spinner.start()
 
     const { body, response } = await (async () => {
-      const mqlOpts = { ...opts, ...restOpts }
       if (url) {
-        const { response, body } = await mql.buffer(
-          url,
-          { endpoint, ...mqlOpts },
-          GOT_OPTS
-        )
-
+        const { response, body } = await mql.buffer(url, mqlOpts, gotOpts)
         return { body, response }
       }
 
-      const { apiKey } = mqlOpts
-      const response = await got(endpoint, {
-        headers: apiKey ? { 'x-api-key': apiKey } : undefined
-      })
+      const response = await got(endpoint, mqlOpts)
       return { response, body: response.body }
     })()
 
@@ -190,4 +174,5 @@ const render = ({ body, response, flags }) => {
   }
 }
 
-module.exports = cli => exit(fetch(cli).then(render), cli)
+module.exports = (cli, gotOpts = {}) =>
+  exit(fetch(cli, gotOpts).then(render), cli)
