@@ -5,7 +5,7 @@
 require('update-notifier')({ pkg: require('../package.json') }).notify()
 
 const escapeStringRegexp = require('escape-string-regexp')
-const querystring = require('querystring')
+const { URLSearchParams } = require('url')
 const clipboardy = require('clipboardy')
 const mql = require('@microlink/mql')
 const prettyMs = require('pretty-ms')
@@ -53,12 +53,14 @@ const getInput = input => {
   return collection.reduce((acc, item) => acc + item.trim(), '')
 }
 
+const toHeaders = input => Object.fromEntries(new URLSearchParams(input))
+
 const fetch = async (cli, gotOpts) => {
   const { pretty, color, copy, endpoint, ...flags } = cli.flags
   const input = getInput(cli.input, endpoint)
   const sanetizedInput = sanetizeInput(input, endpoint)
   const prefixedInput = prefixInput(sanetizedInput, endpoint)
-  const { url, ...queryParams } = querystring.parse(prefixedInput)
+  const { url, ...queryParams } = toHeaders(prefixedInput)
   const mqlOpts = { endpoint, ...queryParams, ...flags }
   const spinner = print.spinner()
 
