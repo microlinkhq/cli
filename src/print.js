@@ -39,8 +39,8 @@ module.exports = {
     }
 
     const stop = () => {
-      spinner.clear()
       clearInterval(interval)
+      spinner.clear()
       return elapsedTime()
     }
 
