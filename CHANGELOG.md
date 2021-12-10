@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 2.0.10 (2021-12-10)
+
+
+### Bug Fixes
+
+* ensure to restore cursor after clear spinner ([f1c84da](https://github.com/microlinkhq/cli/commit/f1c84da0789d757d468e66ef84e2dd4582b4637f))
+
 ### 2.0.9 (2021-12-10)
 
 
