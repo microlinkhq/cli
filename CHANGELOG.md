@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 2.0.9 (2021-12-10)
+
+
+### Bug Fixes
+
+* clear spinner after clear interval ([4ca4429](https://github.com/microlinkhq/cli/commit/4ca44297c9c9ee262c7b2cb1212fb1e657c3b3a2))
+
 ### 2.0.8 (2021-12-08)
 
 ### [2.0.7](https://github.com/microlinkhq/cli/compare/v2.0.6...v2.0.7) (2021-10-09)
