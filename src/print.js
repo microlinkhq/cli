@@ -41,6 +41,7 @@ module.exports = {
     const stop = () => {
       clearInterval(interval)
       spinner.clear()
+      process.stderr.write('\u001B[?25h')
       return elapsedTime()
     }
 
