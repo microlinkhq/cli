@@ -24,6 +24,4 @@ const cli = meow({
   }
 })
 
-if (cli.flags.apiKey) cli.flags.endpoint = 'https://pro.microlink.io'
-
 module.exports = cli
