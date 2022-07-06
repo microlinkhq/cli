@@ -90,9 +90,12 @@ const fetch = async (cli, gotOpts) => {
 const render = ({ body, response, flags }) => {
   const { headers, timings, requestUrl: uri } = response
   if (!flags.pretty) return console.log(body.toString())
-  const time = prettyMs(timings.end - timings.start)
+
   const contentType = headers['content-type'].toLowerCase()
+  const time = prettyMs(timings.end - timings.start)
+  const serverTiming = headers['server-timing']
   const id = headers['x-request-id']
+
   const printMode = (() => {
     if (body.toString().startsWith('data:')) return 'base64'
     if (!contentType.includes('utf')) return 'image'
@@ -112,7 +115,8 @@ const render = ({ body, response, flags }) => {
       break
     default: {
       const isText = contentType.includes('text/plain')
-      const output = isText ? body.toString() : JSON.parse(body)
+      const isHtml = contentType.includes('text/html')
+      const output = isText || isHtml ? body.toString() : JSON.parse(body)
       print.json(output, flags)
       break
     }
@@ -134,6 +138,7 @@ const render = ({ body, response, flags }) => {
   const fetchMode = headers['x-fetch-mode']
   const fetchTime = fetchMode && `(${headers['x-fetch-time']})`
   const size = Number(headers['content-length'] || Buffer.byteLength(body))
+
   console.log()
   console.log(
     print.label('success', 'green'),
@@ -141,28 +146,32 @@ const render = ({ body, response, flags }) => {
   )
   console.log()
 
+  if (serverTiming) {
+    console.log('  ', print.keyValue(colors.green('timing'), serverTiming))
+  }
+
   if (cacheStatus) {
     console.log(
-      '',
+      '   ',
       print.keyValue(
         colors.green('cache'),
-        `${cacheStatus || '-'} ${colors.gray(expiredAt)}`
+        `${cacheStatus} ${colors.gray(expiredAt)}`
       )
     )
   }
 
   if (fetchMode) {
     console.log(
-      '',
+      '    ',
       print.keyValue(
-        colors.green(' mode'),
+        colors.green('mode'),
         `${fetchMode} ${colors.gray(fetchTime)}`
       )
     )
   }
 
-  console.log(cacheStatus ? '  ' : '', print.keyValue(colors.green('uri'), uri))
-  console.log(cacheStatus ? '   ' : ' ', print.keyValue(colors.green('id'), id))
+  console.log('     ', print.keyValue(colors.green('uri'), uri))
+  console.log('      ', print.keyValue(colors.green('id'), id))
 
   if (flags.copy) {
     let copiedValue
