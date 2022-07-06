@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 2.1.0 (2022-07-06)
+
+
+### Features
+
+* add server-timing information ([910d94e](https://github.com/microlinkhq/cli/commit/910d94e8a224e389b3bbc38b3803a715e7ba02ce))
+
 ### 2.0.15 (2022-06-29)
 
 ### 2.0.14 (2022-06-17)
