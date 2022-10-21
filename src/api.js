@@ -39,7 +39,7 @@ const sanetizeInput = (input, endpoint) => {
   if (!input) return input
   const difference = ALL_ENDPOINTS.filter(elem => ![endpoint].includes(elem))
   const endpointRegex = createEndpointRegex(difference)
-  return input.replace(endpointRegex, endpoint)
+  return input.replace(/^url=/, '').replace(endpointRegex, endpoint)
 }
 
 const prefixInput = (input, endpoint) => {
@@ -92,8 +92,8 @@ const render = ({ body, response, flags }) => {
   if (!flags.pretty) return console.log(body.toString())
 
   const contentType = headers['content-type'].toLowerCase()
-  const time = prettyMs(timings.end - timings.start)
-  const serverTiming = headers['server-timing']
+  const time = prettyMs(timings.phases.total)
+  const serverTiming = headers['x-server-timing']
   const id = headers['x-request-id']
 
   const printMode = (() => {
