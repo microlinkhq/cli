@@ -11,7 +11,6 @@ const mql = require('@microlink/mql')
 const prettyMs = require('pretty-ms')
 const colors = require('picocolors')
 const temp = require('temperment')
-const got = require('got')
 const fs = require('fs')
 const os = require('os')
 
@@ -67,17 +66,10 @@ const fetch = async (cli, gotOpts) => {
   try {
     console.log()
     spinner.start()
-
-    const { body, response } = await (async () => {
-      if (url) {
-        const { response, body } = await mql.buffer(url, mqlOpts, gotOpts)
-        return { body, response }
-      }
-
-      const response = await got(endpoint, mqlOpts)
-      return { response, body: response.body }
-    })()
-
+    const { body, response } = await mql.buffer(url, mqlOpts, {
+      retry: 0,
+      ...gotOpts
+    })
     spinner.stop()
     return { body, response, flags: { copy, pretty } }
   } catch (error) {
