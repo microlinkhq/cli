@@ -4,48 +4,27 @@
 
 require('update-notifier')({ pkg: require('../package.json') }).notify()
 
-const escapeStringRegexp = require('escape-string-regexp')
+const localhostUrl = require('localhost-url-regex')
 const { URLSearchParams } = require('url')
 const clipboardy = require('clipboardy')
 const mql = require('@microlink/mql')
 const prettyMs = require('pretty-ms')
 const colors = require('picocolors')
 const temp = require('temperment')
-const got = require('got')
 const fs = require('fs')
 const os = require('os')
 
 const print = require('./print')
 const exit = require('./exit')
 
-const ALL_ENDPOINTS = [
-  'api.microlink.io',
-  'next.microlink.io',
-  'pro.microlink.io',
-  'localhost:3000'
-].reduce(
-  (acc, endpoint) => [
-    ...acc,
-    escapeStringRegexp(`http://${endpoint}`),
-    escapeStringRegexp(`https://${endpoint}`)
-  ],
-  []
-)
+const microlinkUrl = () => /^https?.*\.microlink\.io/gi
 
-const createEndpointRegex = endpoints =>
-  new RegExp(`^(${endpoints.map(endpoint => endpoint).join('|')})`, 'i')
-
-const sanetizeInput = (input, endpoint) => {
+const normalizeInput = input => {
   if (!input) return input
-  const difference = ALL_ENDPOINTS.filter(elem => ![endpoint].includes(elem))
-  const endpointRegex = createEndpointRegex(difference)
-  return input.replace(/^url=/, '').replace(endpointRegex, endpoint)
-}
-
-const prefixInput = (input, endpoint) => {
-  if (input.includes(endpoint)) return input
-  if (input.includes('url=')) return input
-  return `url=${input}`
+  ;[microlinkUrl, localhostUrl].forEach(
+    regex => (input = input.replace(regex(), ''))
+  )
+  return input.replace(/^\??url=/, '')
 }
 
 const getInput = input => {
@@ -53,31 +32,22 @@ const getInput = input => {
   return collection.reduce((acc, item) => acc + item.trim(), '')
 }
 
-const toHeaders = input => Object.fromEntries(new URLSearchParams(input))
+const toPlainObject = input => Object.fromEntries(new URLSearchParams(input))
 
 const fetch = async (cli, gotOpts) => {
   const { pretty, color, copy, endpoint, ...flags } = cli.flags
   const input = getInput(cli.input, endpoint)
-  const sanetizedInput = sanetizeInput(input, endpoint)
-  const prefixedInput = prefixInput(sanetizedInput, endpoint)
-  const { url, ...queryParams } = toHeaders(prefixedInput)
+  const { url, ...queryParams } = toPlainObject(`url=${normalizeInput(input)}`)
   const mqlOpts = { endpoint, ...queryParams, ...flags }
   const spinner = print.spinner()
 
   try {
     console.log()
     spinner.start()
-
-    const { body, response } = await (async () => {
-      if (url) {
-        const { response, body } = await mql.buffer(url, mqlOpts, gotOpts)
-        return { body, response }
-      }
-
-      const response = await got(endpoint, mqlOpts)
-      return { response, body: response.body }
-    })()
-
+    const { body, response } = await mql.buffer(url, mqlOpts, {
+      retry: 0,
+      ...gotOpts
+    })
     spinner.stop()
     return { body, response, flags: { copy, pretty } }
   } catch (error) {
@@ -93,7 +63,7 @@ const render = ({ body, response, flags }) => {
 
   const contentType = headers['content-type'].toLowerCase()
   const time = prettyMs(timings.phases.total)
-  const serverTiming = headers['x-server-timing']
+  const serverTiming = headers['server-timing']
   const id = headers['x-request-id']
 
   const printMode = (() => {
@@ -187,3 +157,5 @@ const render = ({ body, response, flags }) => {
 
 module.exports = (cli, gotOpts = {}) =>
   exit(fetch(cli, gotOpts).then(render), cli)
+
+module.exports.normalizeInput = normalizeInput
