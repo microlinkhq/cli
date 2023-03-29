@@ -85,7 +85,7 @@ const render = ({ body, response, flags }) => {
 
   const contentType = headers['content-type'].toLowerCase()
   const time = prettyMs(timings.phases.total)
-  const serverTiming = headers['x-server-timing']
+  const serverTiming = headers['server-timing']
   const id = headers['x-request-id']
 
   const printMode = (() => {
