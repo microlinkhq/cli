@@ -4,7 +4,7 @@
 
 require('update-notifier')({ pkg: require('../package.json') }).notify()
 
-const escapeStringRegexp = require('escape-string-regexp')
+const localhostUrl = require('localhost-url-regex')
 const { URLSearchParams } = require('url')
 const clipboardy = require('clipboardy')
 const mql = require('@microlink/mql')
@@ -17,34 +17,14 @@ const os = require('os')
 const print = require('./print')
 const exit = require('./exit')
 
-const ALL_ENDPOINTS = [
-  'api.microlink.io',
-  'next.microlink.io',
-  'pro.microlink.io',
-  'localhost:3000'
-].reduce(
-  (acc, endpoint) => [
-    ...acc,
-    escapeStringRegexp(`http://${endpoint}`),
-    escapeStringRegexp(`https://${endpoint}`)
-  ],
-  []
-)
+const microlinkUrl = () => /^https?.*\.microlink\.io/gi
 
-const createEndpointRegex = endpoints =>
-  new RegExp(`^(${endpoints.map(endpoint => endpoint).join('|')})`, 'i')
-
-const sanetizeInput = (input, endpoint) => {
+const normalizeInput = input => {
   if (!input) return input
-  const difference = ALL_ENDPOINTS.filter(elem => ![endpoint].includes(elem))
-  const endpointRegex = createEndpointRegex(difference)
-  return input.replace(/^url=/, '').replace(endpointRegex, endpoint)
-}
-
-const prefixInput = (input, endpoint) => {
-  if (input.includes(endpoint)) return input
-  if (input.includes('url=')) return input
-  return `url=${input}`
+  ;[microlinkUrl, localhostUrl].forEach(
+    regex => (input = input.replace(regex(), ''))
+  )
+  return input.replace(/^\??url=/, '')
 }
 
 const getInput = input => {
@@ -52,14 +32,12 @@ const getInput = input => {
   return collection.reduce((acc, item) => acc + item.trim(), '')
 }
 
-const toHeaders = input => Object.fromEntries(new URLSearchParams(input))
+const toPlainObject = input => Object.fromEntries(new URLSearchParams(input))
 
 const fetch = async (cli, gotOpts) => {
   const { pretty, color, copy, endpoint, ...flags } = cli.flags
   const input = getInput(cli.input, endpoint)
-  const sanetizedInput = sanetizeInput(input, endpoint)
-  const prefixedInput = prefixInput(sanetizedInput, endpoint)
-  const { url, ...queryParams } = toHeaders(prefixedInput)
+  const { url, ...queryParams } = toPlainObject(`url=${normalizeInput(input)}`)
   const mqlOpts = { endpoint, ...queryParams, ...flags }
   const spinner = print.spinner()
 
@@ -179,3 +157,5 @@ const render = ({ body, response, flags }) => {
 
 module.exports = (cli, gotOpts = {}) =>
   exit(fetch(cli, gotOpts).then(render), cli)
+
+module.exports.normalizeInput = normalizeInput

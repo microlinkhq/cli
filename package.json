@@ -33,8 +33,8 @@
   "dependencies": {
     "@microlink/mql": "~0.10.26",
     "clipboardy": "~2.3.0",
-    "escape-string-regexp": "~4.0.0",
     "jsome": "~2.5.0",
+    "localhost-url-regex": "~1.0.3",
     "meow": "~9.0.0",
     "ora": "~5.4.0",
     "picocolors": "~1.0.0",
@@ -48,6 +48,7 @@
   "devDependencies": {
     "@commitlint/cli": "latest",
     "@commitlint/config-conventional": "latest",
+    "ava": "latest",
     "ci-publish": "latest",
     "conventional-github-releaser": "latest",
     "finepack": "latest",
@@ -78,7 +79,7 @@
     "release": "standard-version -a",
     "release:github": "conventional-github-releaser -p angular",
     "release:tags": "git push --follow-tags origin HEAD:master",
-    "test": "exit 0",
+    "test": "ava",
     "update": "ncu -u",
     "update:check": "ncu -- --error-level 2"
   },
