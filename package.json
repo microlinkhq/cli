@@ -31,10 +31,10 @@
     "microlink"
   ],
   "dependencies": {
-    "@microlink/mql": "~0.10.26",
+    "@microlink/mql": "~0.10.33",
     "clipboardy": "~2.3.0",
     "jsome": "~2.5.0",
-    "localhost-url-regex": "~1.0.4",
+    "localhost-url-regex": "~1.0.7",
     "meow": "~9.0.0",
     "ora": "~5.4.0",
     "picocolors": "~1.0.0",
