@@ -1,12 +1,15 @@
 'use strict'
 
+const { createSpinner } = require('nanospinner')
+const restoreCursor = require('restore-cursor')
 const terminalLink = require('terminal-link')
 const prettyBytes = require('pretty-bytes')
 const prettyMs = require('pretty-ms')
 const colors = require('picocolors')
 const termImg = require('term-img')
 const jsome = require('jsome')
-const ora = require('ora')
+
+const TICK_INTERVAL = 100
 
 jsome.colors = {
   num: 'cyan',
@@ -22,24 +25,25 @@ jsome.colors = {
 }
 
 module.exports = {
-  spinner: (text = '') => {
-    const spinner = ora({ color: 'white', text })
+  spinner: () => {
     const now = Date.now()
-    const elapsedTime = () => Date.now() - now
-    let interval
+    const elapsedTime = () => prettyMs(Date.now() - now)
+    const spinner = createSpinner(elapsedTime(), { color: 'white' })
+    let timer
 
     const start = () => {
-      interval = setInterval(() => {
-        const duration = elapsedTime()
-        if (duration > 500) spinner.text = `${prettyMs(duration)} ${text}`
-      }, 100)
-      spinner.start()
+      console.error()
+      spinner.start({ text: elapsedTime() })
+      timer = setInterval(
+        () => spinner.update({ text: elapsedTime() }),
+        TICK_INTERVAL
+      )
     }
 
     const stop = () => {
-      spinner.stop()
-      clearInterval(interval)
-      return elapsedTime()
+      clearInterval(timer)
+      spinner.clear()
+      restoreCursor()
     }
 
     return { start, stop }

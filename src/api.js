@@ -42,7 +42,6 @@ const fetch = async (cli, gotOpts) => {
   const spinner = print.spinner()
 
   try {
-    console.log()
     spinner.start()
     const { body, response } = await mql.buffer(url, mqlOpts, {
       retry: 0,
@@ -109,19 +108,19 @@ const render = ({ body, response, flags }) => {
   const fetchTime = fetchMode && `(${headers['x-fetch-time']})`
   const size = Number(headers['content-length'] || Buffer.byteLength(body))
 
-  console.log()
-  console.log(
+  console.error()
+  console.error(
     print.label('success', 'green'),
     colors.gray(`${print.bytes(size)} in ${time}`)
   )
-  console.log()
+  console.error()
 
   if (serverTiming) {
-    console.log('  ', print.keyValue(colors.green('timing'), serverTiming))
+    console.error('  ', print.keyValue(colors.green('timing'), serverTiming))
   }
 
   if (cacheStatus) {
-    console.log(
+    console.error(
       '   ',
       print.keyValue(
         colors.green('cache'),
@@ -131,7 +130,7 @@ const render = ({ body, response, flags }) => {
   }
 
   if (fetchMode) {
-    console.log(
+    console.error(
       '    ',
       print.keyValue(
         colors.green('mode'),
@@ -140,8 +139,8 @@ const render = ({ body, response, flags }) => {
     )
   }
 
-  console.log('     ', print.keyValue(colors.green('uri'), uri))
-  console.log('      ', print.keyValue(colors.green('id'), id))
+  console.error('     ', print.keyValue(colors.green('uri'), uri))
+  console.error('      ', print.keyValue(colors.green('id'), id))
 
   if (flags.copy) {
     let copiedValue
@@ -151,7 +150,7 @@ const render = ({ body, response, flags }) => {
       copiedValue = body
     }
     clipboardy.writeSync(JSON.stringify(copiedValue, null, 2))
-    console.log(`\n   ${colors.gray('Copied to clipboard!')}`)
+    console.error(`\n   ${colors.gray('Copied to clipboard!')}`)
   }
 }
 
