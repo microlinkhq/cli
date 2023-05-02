@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
 const cli = require('../src/cli')
-
 if (cli.input.length === 0) cli.showHelp()
-require('../src/api')(cli)
+else require('../src/api')(cli)

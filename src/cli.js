@@ -1,11 +1,9 @@
 'use strict'
 
-const meow = require('meow')
+const mri = require('mri')
 
-const cli = meow({
-  description: false,
-  help: require('./help'),
-  flags: {
+const { _, ...flags } = mri(process.argv.slice(2), {
+  default: {
     apiKey: {
       default: process.env.MICROLINK_API_KEY
     },
@@ -24,4 +22,8 @@ const cli = meow({
   }
 })
 
-module.exports = cli
+module.exports = {
+  flags,
+  input: _,
+  showHelp: () => console.log(require('./help'))
+}
