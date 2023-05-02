@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 2.1.8 (2023-05-02)
+
+
+### Bug Fixes
+
+* flag types ([53305f1](https://github.com/microlinkhq/cli/commit/53305f1a1c2437f9476094ca959f340161450744))
+
 ### 2.1.7 (2023-05-02)
 
 ### 2.1.6 (2023-05-02)
