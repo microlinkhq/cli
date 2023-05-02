@@ -9,7 +9,7 @@ const colors = require('picocolors')
 const termImg = require('term-img')
 const jsome = require('jsome')
 
-const TICK_INTERVAL = 100
+const TICK_INTERVAL = 50
 
 jsome.colors = {
   num: 'cyan',
