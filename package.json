@@ -1,7 +1,7 @@
 {
   "name": "@microlink/cli",
   "description": "Interacting with Microlink API from your terminal.",
-  "homepage": "https://nicedoc.io/microlinkhq/cli",
+  "homepage": "https://github.com/microlinkhq/cli",
   "version": "2.1.7",
   "main": "src/index.js",
   "bin": {
