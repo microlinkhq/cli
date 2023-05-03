@@ -15,5 +15,8 @@ const { _, ...flags } = mri(process.argv.slice(2), {
 module.exports = {
   flags,
   input: _,
-  showHelp: () => console.log(require('./help'))
+  showHelp: () => {
+    console.log(require('./help'))
+    process.exit(0)
+  }
 }
