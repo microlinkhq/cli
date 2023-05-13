@@ -1,5 +1,6 @@
 <div align="center">
-  <img src="https://cdn.microlink.io/banner/cli.png" alt="microlink logo">
+  <img src="https://github.com/microlinkhq/cdn/raw/master/dist/banner/cli.png#gh-light-mode-only" alt="microlink cdn">
+  <img src="https://github.com/microlinkhq/cdn/raw/master/dist/banner/cli-dark.png#gh-dark-mode-only" alt="microlink cdn">
 </div>
 
 ###### [Documentation](docs/api/getting-started/cli) | [Chat](https://microlink.io/chat)
