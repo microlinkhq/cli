@@ -4,7 +4,6 @@ const { createSpinner } = require('nanospinner')
 const restoreCursor = require('restore-cursor')
 const terminalLink = require('terminal-link')
 const prettyBytes = require('pretty-bytes')
-const { onExit } = require('signal-exit')
 const prettyMs = require('pretty-ms')
 const colors = require('picocolors')
 const termImg = require('term-img')
@@ -35,7 +34,10 @@ module.exports = {
     const start = () => {
       console.error()
       spinner.start({ text: elapsedTime() })
-      onExit((_, signal) => signal !== null && restoreCursor())
+      process.on('SIGINT', () => {
+        restoreCursor()
+        process.exit(130)
+      })
       timer = setInterval(
         () => spinner.update({ text: elapsedTime() }),
         TICK_INTERVAL
