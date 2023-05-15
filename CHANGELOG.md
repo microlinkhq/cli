@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 2.1.11 (2023-05-15)
+
+
+### Bug Fixes
+
+* ensure to restore cursor on exit under signal ([5ecd14f](https://github.com/microlinkhq/cli/commit/5ecd14f2ceff4d6e0f4f7ac2eb55b24c198e6640))
+
 ### 2.1.10 (2023-05-13)
 
 ### 2.1.9 (2023-05-03)
