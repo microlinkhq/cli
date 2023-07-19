@@ -17,7 +17,8 @@ const os = require('os')
 const print = require('./print')
 const exit = require('./exit')
 
-const microlinkUrl = () => /^https?.*\.microlink\.io/gi
+const microlinkUrl = () =>
+  /^https?:\/\/((?!geolocation\.)[a-z0-9-]+\.)?microlink\.io/
 
 const normalizeInput = input => {
   if (!input) return input
@@ -43,10 +44,7 @@ const fetch = async (cli, gotOpts) => {
 
   try {
     spinner.start()
-    const { body, response } = await mql.buffer(url, mqlOpts, {
-      retry: 0,
-      ...gotOpts
-    })
+    const { body, response } = await mql.buffer(url, mqlOpts, gotOpts)
     spinner.stop()
     return { body, response, flags: { copy, pretty } }
   } catch (error) {
