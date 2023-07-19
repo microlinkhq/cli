@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 2.1.13 (2023-07-19)
+
+
+### Bug Fixes
+
+* excluse geolocation subdomain ([6e1aa3f](https://github.com/microlinkhq/cli/commit/6e1aa3f00548ef0c049d0d10f2157c937017ae8a))
+
 ### 2.1.12 (2023-05-15)
 
 ### 2.1.11 (2023-05-15)
