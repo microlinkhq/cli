@@ -8,7 +8,8 @@ const { _, ...flags } = mri(process.argv.slice(2), {
     apiKey: process.env.MICROLINK_API_KEY,
     pretty: true,
     color: true,
-    copy: false
+    copy: false,
+    retry: 0
   }
 })
 
