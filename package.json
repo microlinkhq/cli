@@ -31,10 +31,10 @@
     "microlink"
   ],
   "dependencies": {
-    "@microlink/mql": "~0.11.0",
+    "@microlink/mql": "~0.11.2",
     "clipboardy": "~2.3.0",
     "jsome": "~2.5.0",
-    "localhost-url-regex": "~1.0.8",
+    "localhost-url-regex": "~1.0.9",
     "mri": "~1.2.0",
     "nanospinner": "~1.1.0",
     "picocolors": "~1.0.0",
@@ -92,7 +92,7 @@
     ]
   },
   "nano-staged": {
-    "*.js,!*.min.js,": [
+    "*.js": [
       "prettier-standard",
       "standard --fix"
     ],
