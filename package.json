@@ -44,7 +44,7 @@
     "temperment": "~1.0.0",
     "term-img": "~5.0.0",
     "terminal-link": "~2.1.1",
-    "update-notifier": "~5.1.0"
+    "update-notifier": "~7.0.0"
   },
   "devDependencies": {
     "@commitlint/cli": "latest",
