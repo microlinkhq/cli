@@ -3,7 +3,7 @@
   <img src="https://github.com/microlinkhq/cdn/raw/master/dist/banner/cli-dark.png#gh-dark-mode-only" alt="microlink cdn">
 </div>
 
-###### [Documentation](docs/api/getting-started/cli) | [Chat](https://microlink.io/chat)
+###### [Website](https://microlink.io/) | [Documentation](https://microlink.io/docs/api/getting-started/overview) | [Playground](https://mql.microlink.io)
 
 ## Installation
 
