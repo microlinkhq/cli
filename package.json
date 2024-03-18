@@ -33,7 +33,7 @@
     "microlink"
   ],
   "dependencies": {
-    "@microlink/mql": "~0.12.1",
+    "@microlink/mql": "~0.13.4",
     "clipboardy": "~2.3.0",
     "jsome": "~2.5.0",
     "localhost-url-regex": "~1.0.9",
