@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 2.1.25 (2024-04-04)
+
+
+### Bug Fixes
+
+* exclude microlink subdomains ([de957f6](https://github.com/microlinkhq/cli/commit/de957f671d7132585f033c61f69f1a28a2276e6f))
+
 ### [2.1.24](https://github.com/microlinkhq/cli/compare/v2.1.23...v2.1.24) (2024-04-04)
 
 
