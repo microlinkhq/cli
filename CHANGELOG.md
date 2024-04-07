@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 2.1.26 (2024-04-07)
+
+
+### Bug Fixes
+
+* get body from response ([ec13168](https://github.com/microlinkhq/cli/commit/ec13168840d3f498f9e69ea54323c6b4c7f03f87))
+
 ### 2.1.25 (2024-04-04)
 
 
