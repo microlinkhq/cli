@@ -44,9 +44,9 @@ const fetch = async (cli, gotOpts) => {
 
   try {
     spinner.start()
-    const { body, response } = await mql.buffer(url, mqlOpts, gotOpts)
+    const response = await mql.buffer(url, mqlOpts, gotOpts)
     spinner.stop()
-    return { body, response, flags: { copy, pretty } }
+    return { response, flags: { copy, pretty } }
   } catch (error) {
     spinner.stop()
     error.flags = cli.flags
@@ -54,8 +54,8 @@ const fetch = async (cli, gotOpts) => {
   }
 }
 
-const render = ({ body, response, flags }) => {
-  const { headers, timings, requestUrl: uri } = response
+const render = ({ response, flags }) => {
+  const { headers, timings, requestUrl: uri, body } = response
   if (!flags.pretty) return console.log(body.toString())
 
   const contentType = headers['content-type'].toLowerCase()
