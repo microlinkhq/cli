@@ -35,8 +35,8 @@
   "dependencies": {
     "@microlink/mql": "~0.13.14",
     "clipboardy": "~2.3.0",
+    "is-local-address": "~2.0.0",
     "jsome": "~2.5.0",
-    "localhost-url-regex": "~1.0.13",
     "mri": "~1.2.0",
     "nanospinner": "~1.2.2",
     "picocolors": "~1.1.1",

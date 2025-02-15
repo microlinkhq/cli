@@ -4,7 +4,6 @@
 
 require('update-notifier')({ pkg: require('../package.json') }).notify()
 
-const localhostUrl = require('localhost-url-regex')
 const { URLSearchParams } = require('url')
 const clipboardy = require('clipboardy')
 const mql = require('@microlink/mql')
@@ -22,9 +21,13 @@ const microlinkUrl = () =>
 
 const normalizeInput = input => {
   if (!input) return input
-  ;[microlinkUrl, localhostUrl].forEach(
-    regex => (input = input.replace(regex(), ''))
-  )
+  ;[
+    microlinkUrl,
+    () => require('is-local-address/ipv4').regex,
+    () => require('is-local-address/ipv6').regex
+  ].forEach(regex => {
+    return (input = input.replace(regex(), ''))
+  })
   return input.replace(/^\??url=/, '')
 }
 
