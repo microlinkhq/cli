@@ -61,14 +61,14 @@ const render = ({ response, flags }) => {
   const { headers, timings, requestUrl: uri, body } = response
   if (!flags.pretty) return console.log(body.toString())
 
-  const contentType = headers['content-type'].toLowerCase()
+  const contentType = headers['content-type'].split(';')[0].toLowerCase()
   const time = prettyMs(timings.phases.total)
   const serverTiming = headers['server-timing']
   const id = headers['x-request-id']
 
   const printMode = (() => {
     if (body.toString().startsWith('data:')) return 'base64'
-    if (!contentType.includes('utf')) return 'image'
+    if (contentType !== 'application/json') return 'image'
   })()
 
   switch (printMode) {
@@ -84,8 +84,8 @@ const render = ({ response, flags }) => {
       console.log()
       break
     default: {
-      const isText = contentType.includes('text/plain')
-      const isHtml = contentType.includes('text/html')
+      const isText = contentType === 'text/plain'
+      const isHtml = contentType === 'text/html'
       const output = isText || isHtml ? body.toString() : JSON.parse(body)
       print.json(output, flags)
       break
