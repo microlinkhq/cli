@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 2.1.35 (2025-03-03)
+
+
+### Bug Fixes
+
+* better content-type check ([0de117b](https://github.com/microlinkhq/cli/commit/0de117be95b6eda6dca3a19aa4e32260ab2472ff))
+
 ### 2.1.34 (2025-03-01)
 
 ### 2.1.33 (2025-02-15)
