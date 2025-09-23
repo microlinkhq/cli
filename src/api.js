@@ -17,7 +17,7 @@ const print = require('./print')
 const exit = require('./exit')
 
 const microlinkUrl = () =>
-  /^https?:\/\/((?!geolocation\.)[a-z0-9-]+\.)+microlink\.io/
+  /^https?:\/\/((?!fonts|geolocation\.)[a-z0-9-]+\.)+microlink\.io/
 
 const normalizeInput = input => {
   if (!input) return input
