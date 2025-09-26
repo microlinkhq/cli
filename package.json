@@ -34,7 +34,7 @@
   ],
   "dependencies": {
     "@microlink/mql": "~0.14.0",
-    "clipboardy": "~2.3.0",
+    "clipboardy": "~5.0.0",
     "is-local-address": "~2.2.0",
     "jsome": "~2.5.0",
     "mri": "~1.2.0",
