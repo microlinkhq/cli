@@ -4,6 +4,7 @@
 
 require('update-notifier')({ pkg: require('../package.json') }).notify()
 
+const getContentType = require('@kikobeats/content-type')
 const { URLSearchParams } = require('url')
 const clipboardy = require('clipboardy')
 const mql = require('@microlink/mql')
@@ -61,7 +62,7 @@ const render = ({ response, flags }) => {
   const { headers, timings, requestUrl: uri, body } = response
   if (!flags.pretty) return console.log(body.toString())
 
-  const contentType = headers['content-type'].split(';')[0].toLowerCase()
+  const contentType = getContentType(headers['content-type'])
   const time = prettyMs(timings.phases.total)
   const serverTiming = headers['server-timing']
   const id = headers['x-request-id']
