@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 2.1.43 (2025-10-07)
+
+
+### Bug Fixes
+
+* dependency ([37096a4](https://github.com/microlinkhq/cli/commit/37096a4490b9e62e8187a343813741dfab09c6ec))
+
 ### [2.1.42](https://github.com/microlinkhq/cli/compare/v2.1.41...v2.1.42) (2025-09-30)
 
 ### 2.1.41 (2025-09-23)
