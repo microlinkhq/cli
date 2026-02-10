@@ -1,6 +1,6 @@
 'use strict'
 
-const { gray, white } = require('picocolors')
+const { gray, white } = require('./colors')
 
 const code = str => `\`${str}\``
 
