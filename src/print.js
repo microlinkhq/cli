@@ -5,9 +5,10 @@ const restoreCursor = require('restore-cursor')
 const terminalLink = require('terminal-link')
 const prettyBytes = require('pretty-bytes')
 const prettyMs = require('pretty-ms')
-const colors = require('picocolors')
 const termImg = require('term-img')
 const jsome = require('jsome')
+
+const { gray, yellow, label } = require('./colors')
 
 const TICK_INTERVAL = 50
 
@@ -55,19 +56,18 @@ module.exports = {
   json: (payload, { color: colorize = true } = {}) =>
     colorize ? jsome(payload) : console.log(payload),
 
-  label: (text, color) =>
-    colors.inverse(colors.bold(colors[color](` ${text.toUpperCase()} `))),
+  label,
 
   bytes: prettyBytes,
 
-  keyValue: (key, value) => key + ' ' + colors.gray(value),
+  keyValue: (key, value) => key + ' ' + gray(value),
 
   image: filepath =>
     console.log(
       termImg(filepath, {
         width: '50%',
         fallback: () =>
-          `\n${colors.yellow('  tip:')} ${colors.gray(
+          `\n${yellow('  tip:')} ${gray(
             'use iTerm >=3 to see the image here!'
           )}`
       })

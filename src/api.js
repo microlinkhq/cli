@@ -9,11 +9,11 @@ const { URLSearchParams } = require('url')
 const clipboardy = require('clipboardy')
 const mql = require('@microlink/mql')
 const prettyMs = require('pretty-ms')
-const colors = require('picocolors')
 const temp = require('temperment')
 const fs = require('fs')
 const os = require('os')
 
+const { gray, green } = require('./colors')
 const print = require('./print')
 const exit = require('./exit')
 
@@ -113,36 +113,30 @@ const render = ({ response, flags }) => {
   console.error()
   console.error(
     print.label('success', 'green'),
-    colors.gray(`${print.bytes(size)} in ${time}`)
+    gray(`${print.bytes(size)} in ${time}`)
   )
   console.error()
 
   if (serverTiming) {
-    console.error('  ', print.keyValue(colors.green('timing'), serverTiming))
+    console.error('  ', print.keyValue(green('timing'), serverTiming))
   }
 
   if (cacheStatus) {
     console.error(
       '   ',
-      print.keyValue(
-        colors.green('cache'),
-        `${cacheStatus} ${colors.gray(expiredAt)}`
-      )
+      print.keyValue(green('cache'), `${cacheStatus} ${gray(expiredAt)}`)
     )
   }
 
   if (fetchMode) {
     console.error(
       '    ',
-      print.keyValue(
-        colors.green('mode'),
-        `${fetchMode} ${colors.gray(fetchTime)}`
-      )
+      print.keyValue(green('mode'), `${fetchMode} ${gray(fetchTime)}`)
     )
   }
 
-  console.error('     ', print.keyValue(colors.green('uri'), uri))
-  console.error('      ', print.keyValue(colors.green('id'), id))
+  console.error('     ', print.keyValue(green('uri'), uri))
+  console.error('      ', print.keyValue(green('id'), id))
 
   if (flags.copy) {
     let copiedValue
@@ -152,7 +146,7 @@ const render = ({ response, flags }) => {
       copiedValue = body
     }
     clipboardy.writeSync(JSON.stringify(copiedValue, null, 2))
-    console.error(`\n   ${colors.gray('Copied to clipboard!')}`)
+    console.error(`\n   ${gray('Copied to clipboard!')}`)
   }
 }
 
