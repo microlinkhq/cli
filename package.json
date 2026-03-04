@@ -4,6 +4,7 @@
   "homepage": "https://github.com/microlinkhq/cli",
   "version": "2.1.49",
   "main": "src/index.js",
+  "types": "index.d.ts",
   "bin": {
     "microlink": "bin/microlink",
     "microlink-dev": "bin/microlink-dev",
@@ -69,7 +70,8 @@
   },
   "files": [
     "bin",
-    "src"
+    "src",
+    "index.d.ts"
   ],
   "scripts": {
     "clean": "rm -rf node_modules",
