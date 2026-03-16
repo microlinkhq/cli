@@ -34,7 +34,7 @@
   ],
   "dependencies": {
     "@kikobeats/content-type": "~1.0.1",
-    "@microlink/mql": "~0.14.0",
+    "@microlink/mql": "~0.15.1",
     "clipboardy": "~2.3.0",
     "is-local-address": "~2.3.0",
     "jsome": "~2.5.0",
