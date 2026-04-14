@@ -24,10 +24,12 @@ Flags
       white('true')
     )}).`
   )}
+  ${gray('-H <header>    pass custom HTTP header to the request (repeatable).')}
 
 
 Examples
   ${gray('microlink https://microlink.io&palette')}
   ${gray('microlink https://microlink.io&palette --no-pretty')}
   ${gray('microlink https://microlink.io&palette --api-key=MyApiKey')}
+  ${gray("microlink https://example.com -H 'x-user-cookie: 1'")}
 `

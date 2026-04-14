@@ -46,9 +46,13 @@ const fetch = async (cli, gotOpts) => {
   const mqlOpts = { endpoint, ...queryParams, ...flags }
   const spinner = print.spinner()
 
+  const mergedGotOpts = Object.keys(cli.headers).length > 0
+    ? { ...gotOpts, headers: { ...gotOpts.headers, ...cli.headers } }
+    : gotOpts
+
   try {
     spinner.start()
-    const response = await mql.buffer(url, mqlOpts, gotOpts)
+    const response = await mql.buffer(url, mqlOpts, mergedGotOpts)
     spinner.stop()
     return { response, flags: { copy, pretty } }
   } catch (error) {
