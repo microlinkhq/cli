@@ -33,10 +33,10 @@
     "microlink"
   ],
   "dependencies": {
-    "@kikobeats/content-type": "~1.0.1",
+    "@kikobeats/content-type": "~1.0.4",
     "@microlink/mql": "~0.16.0",
     "clipboardy": "~2.3.0",
-    "is-local-address": "~2.3.0",
+    "is-local-address": "~2.3.4",
     "jsome": "~2.5.0",
     "mri": "~1.2.0",
     "nanospinner": "~1.2.2",
