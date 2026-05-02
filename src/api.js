@@ -61,9 +61,11 @@ const fetch = async (cli, gotOpts) => {
 
   try {
     if (shouldSpin) spinner.start()
+    const start = Date.now()
     const mqlResponse = isJson
       ? await mql(url, mqlOpts, mergedGotOpts)
       : await mql.buffer(url, mqlOpts, mergedGotOpts)
+    const duration = Date.now() - start
     const response = isJson
       ? printJson({
         requestUrl,
@@ -74,7 +76,7 @@ const fetch = async (cli, gotOpts) => {
       })
       : mqlResponse
     if (shouldSpin) spinner.stop()
-    return { response, flags: { copy, pretty, json: isJson } }
+    return { response, duration, flags: { copy, pretty, json: isJson } }
   } catch (error) {
     if (shouldSpin) spinner.stop()
     error.flags = cli.flags
@@ -82,8 +84,8 @@ const fetch = async (cli, gotOpts) => {
   }
 }
 
-const render = ({ response, flags }) => {
-  const { headers, timings, requestUrl, url: responseUrl, body } = response
+const render = ({ response, duration, flags }) => {
+  const { headers, requestUrl, url: responseUrl, body } = response
   if (flags.json) {
     if (flags.copy) clipboardy.writeSync(response)
     if (!flags.pretty) return console.log(response)
@@ -105,13 +107,7 @@ const render = ({ response, flags }) => {
   if (!flags.pretty) return console.log(bodyText)
 
   const contentType = getContentType(plainHeaders['content-type'])
-  const totalTime = timings?.phases?.total
-  const responseTime = Number(plainHeaders['x-response-time'])
-  const time = Number.isFinite(totalTime)
-    ? prettyMs(totalTime)
-    : Number.isFinite(responseTime)
-      ? prettyMs(responseTime)
-      : 'unknown'
+  const time = Number.isFinite(duration) ? prettyMs(duration) : 'unknown'
   const serverTiming = plainHeaders['server-timing']
   const id = plainHeaders['x-request-id']
 
