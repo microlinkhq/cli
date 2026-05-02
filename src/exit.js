@@ -2,7 +2,7 @@
 
 const { gray, red } = require('./colors')
 
-const print = require('./print')
+const print = require('./print-text')
 
 module.exports = async (promise, { flags }) => {
   try {

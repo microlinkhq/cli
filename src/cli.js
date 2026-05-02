@@ -2,17 +2,33 @@
 
 const mri = require('mri')
 
-const { _, header, ...flags } = mri(process.argv.slice(2), {
+const supportsColorOutput = () => {
+  if (process.env.NO_COLOR) return false
+  if (process.env.FORCE_COLOR === '0') return false
+
+  if (process.stdout && typeof process.stdout.hasColors === 'function') {
+    return process.stdout.hasColors()
+  }
+
+  return Boolean(process.stdout && process.stdout.isTTY)
+}
+
+const parsed = mri(process.argv.slice(2), {
   alias: { H: 'header' },
-  boolean: ['color', 'copy', 'pretty'],
+  boolean: ['copy', 'json', 'jsonFull', 'pretty'],
   string: ['header'],
   default: {
     apiKey: process.env.MICROLINK_API_KEY,
-    pretty: true,
-    color: true,
-    copy: false
+    pretty: supportsColorOutput(),
+    copy: false,
+    json: false,
+    jsonFull: false
   }
 })
+
+const { _, header, 'json-full': jsonFullDashed, ...flags } = parsed
+
+flags.jsonFull = Boolean(flags.jsonFull || jsonFullDashed)
 
 const parseHeaders = raw => {
   if (!raw) return {}
@@ -21,7 +37,9 @@ const parseHeaders = raw => {
   for (const entry of entries) {
     const idx = entry.indexOf(':')
     if (idx === -1) continue
-    headers[entry.slice(0, idx).trim().toLowerCase()] = entry.slice(idx + 1).trim()
+    headers[entry.slice(0, idx).trim().toLowerCase()] = entry
+      .slice(idx + 1)
+      .trim()
   }
   return headers
 }

@@ -14,7 +14,8 @@ const fs = require('fs')
 const os = require('os')
 
 const { gray, green } = require('./colors')
-const print = require('./print')
+const printJson = require('./print-json')
+const printText = require('./print-text')
 const exit = require('./exit')
 
 const microlinkUrl = () =>
@@ -40,114 +41,160 @@ const getInput = input => {
 const toPlainObject = input => Object.fromEntries(new URLSearchParams(input))
 
 const fetch = async (cli, gotOpts) => {
-  const { pretty, color, copy, endpoint, ...flags } = cli.flags
+  const { pretty, copy, json, jsonFull, endpoint, ...flags } = cli.flags
+  const isJson = json || jsonFull
   const input = getInput(cli.input, endpoint)
   const { url, ...queryParams } = toPlainObject(`url=${normalizeInput(input)}`)
   const mqlOpts = { endpoint, ...queryParams, ...flags }
-  const spinner = print.spinner()
+  const spinner = printText.spinner()
+  const shouldSpin = !isJson && pretty
 
-  const mergedGotOpts = Object.keys(cli.headers).length > 0
-    ? { ...gotOpts, headers: { ...gotOpts.headers, ...cli.headers } }
-    : gotOpts
+  const mergedGotOpts =
+    Object.keys(cli.headers).length > 0
+      ? { ...gotOpts, headers: { ...gotOpts.headers, ...cli.headers } }
+      : gotOpts
+  const [requestUrl, requestOptions] = mql.getApiUrl(
+    url,
+    mqlOpts,
+    mergedGotOpts
+  )
 
   try {
-    spinner.start()
-    const response = await mql.buffer(url, mqlOpts, mergedGotOpts)
-    spinner.stop()
-    return { response, flags: { copy, pretty } }
+    if (shouldSpin) spinner.start()
+    const mqlResponse = isJson
+      ? await mql(url, mqlOpts, mergedGotOpts)
+      : await mql.buffer(url, mqlOpts, mergedGotOpts)
+    const response = isJson
+      ? printJson({
+        requestUrl,
+        requestOptions,
+        response: mqlResponse.response,
+        full: jsonFull,
+        pretty
+      })
+      : mqlResponse
+    if (shouldSpin) spinner.stop()
+    return { response, flags: { copy, pretty, json: isJson } }
   } catch (error) {
-    spinner.stop()
+    if (shouldSpin) spinner.stop()
     error.flags = cli.flags
     throw error
   }
 }
 
 const render = ({ response, flags }) => {
-  const { headers, timings, requestUrl: uri, body } = response
-  if (!flags.pretty) return console.log(body.toString())
+  const { headers, timings, requestUrl, url: responseUrl, body } = response
+  if (flags.json) {
+    if (flags.copy) clipboardy.writeSync(response)
+    if (!flags.pretty) return console.log(response)
+    try {
+      return printText.json(JSON.parse(response), { color: true })
+    } catch (error) {
+      return console.log(response)
+    }
+  }
 
-  const contentType = getContentType(headers['content-type'])
-  const time = prettyMs(timings.phases.total)
-  const serverTiming = headers['server-timing']
-  const id = headers['x-request-id']
+  const plainHeaders =
+    headers && typeof headers.entries === 'function'
+      ? Object.fromEntries(headers.entries())
+      : headers
+
+  const bodyBuffer = Buffer.isBuffer(body) ? body : Buffer.from(body)
+  const bodyText = bodyBuffer.toString()
+
+  if (!flags.pretty) return console.log(bodyText)
+
+  const contentType = getContentType(plainHeaders['content-type'])
+  const totalTime = timings?.phases?.total
+  const responseTime = Number(plainHeaders['x-response-time'])
+  const time = Number.isFinite(totalTime)
+    ? prettyMs(totalTime)
+    : Number.isFinite(responseTime)
+      ? prettyMs(responseTime)
+      : 'unknown'
+  const serverTiming = plainHeaders['server-timing']
+  const id = plainHeaders['x-request-id']
 
   const printMode = (() => {
-    if (body.toString().startsWith('data:')) return 'base64'
+    if (bodyText.startsWith('data:')) return 'base64'
     if (contentType !== 'application/json') return 'image'
   })()
 
   switch (printMode) {
     case 'base64': {
-      const extension = contentType.split('/')[1].split(';')[0]
+      const extension = contentType
+        ? contentType.split('/')[1].split(';')[0]
+        : 'png'
       const filepath = temp.file({ extension })
-      fs.writeFileSync(filepath, body.toString().split(',')[1], 'base64')
-      print.image(filepath)
+      fs.writeFileSync(filepath, bodyText.split(',')[1], 'base64')
+      printText.image(filepath)
       break
     }
     case 'image':
-      print.image(body)
+      printText.image(bodyBuffer)
       console.log()
       break
     default: {
       const isText = contentType === 'text/plain'
       const isHtml = contentType === 'text/html'
-      const output = isText || isHtml ? body.toString() : JSON.parse(body)
-      print.json(output, flags)
+      const output = isText || isHtml ? bodyText : JSON.parse(bodyText)
+      printText.json(output, flags)
       break
     }
   }
 
-  const edgeCacheStatus = headers['cf-cache-status']
-  const unifiedCacheStatus = headers['x-cache-status']
+  const edgeCacheStatus = plainHeaders['cf-cache-status']
+  const unifiedCacheStatus = plainHeaders['x-cache-status']
 
   const cacheStatus =
     unifiedCacheStatus === 'MISS' && edgeCacheStatus === 'HIT'
       ? edgeCacheStatus
       : unifiedCacheStatus
 
-  const timestamp = Number(headers['x-timestamp'])
-  const ttl = Number(headers['x-cache-ttl'])
+  const timestamp = Number(plainHeaders['x-timestamp'])
+  const ttl = Number(plainHeaders['x-cache-ttl'])
   const expires = timestamp + ttl - Date.now()
   const expiration = prettyMs(expires)
   const expiredAt = cacheStatus === 'HIT' ? `(${expiration})` : ''
-  const fetchMode = headers['x-fetch-mode']
-  const fetchTime = fetchMode && `(${headers['x-fetch-time']})`
-  const size = Number(headers['content-length'] || Buffer.byteLength(body))
+  const fetchMode = plainHeaders['x-fetch-mode']
+  const fetchTime = fetchMode && `(${plainHeaders['x-fetch-time']})`
+  const size = Number(plainHeaders['content-length'] || bodyBuffer.length)
+  const uri = requestUrl || responseUrl
 
   console.error()
   console.error(
-    print.label('success', 'green'),
-    gray(`${print.bytes(size)} in ${time}`)
+    printText.label('success', 'green'),
+    gray(`${printText.bytes(size)} in ${time}`)
   )
   console.error()
 
   if (serverTiming) {
-    console.error('  ', print.keyValue(green('timing'), serverTiming))
+    console.error('  ', printText.keyValue(green('timing'), serverTiming))
   }
 
   if (cacheStatus) {
     console.error(
       '   ',
-      print.keyValue(green('cache'), `${cacheStatus} ${gray(expiredAt)}`)
+      printText.keyValue(green('cache'), `${cacheStatus} ${gray(expiredAt)}`)
     )
   }
 
   if (fetchMode) {
     console.error(
       '    ',
-      print.keyValue(green('mode'), `${fetchMode} ${gray(fetchTime)}`)
+      printText.keyValue(green('mode'), `${fetchMode} ${gray(fetchTime)}`)
     )
   }
 
-  console.error('     ', print.keyValue(green('uri'), uri))
-  console.error('      ', print.keyValue(green('id'), id))
+  console.error('     ', printText.keyValue(green('uri'), uri))
+  console.error('      ', printText.keyValue(green('id'), id))
 
   if (flags.copy) {
     let copiedValue
     try {
-      copiedValue = JSON.parse(body)
+      copiedValue = JSON.parse(bodyText)
     } catch (err) {
-      copiedValue = body
+      copiedValue = bodyText
     }
     clipboardy.writeSync(JSON.stringify(copiedValue, null, 2))
     console.error(`\n   ${gray('Copied to clipboard!')}`)
