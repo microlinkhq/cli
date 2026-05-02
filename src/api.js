@@ -41,7 +41,14 @@ const getInput = input => {
 const toPlainObject = input => Object.fromEntries(new URLSearchParams(input))
 
 const fetch = async (cli, gotOpts) => {
-  const { pretty, copy, json, jsonFull, endpoint, ...flags } = cli.flags
+  const {
+    pretty,
+    copy,
+    json,
+    'json-full': jsonFull,
+    endpoint,
+    ...flags
+  } = cli.flags
   const isJson = json || jsonFull
   const input = getInput(cli.input, endpoint)
   const { url, ...queryParams } = toPlainObject(`url=${normalizeInput(input)}`)

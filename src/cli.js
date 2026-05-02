@@ -2,33 +2,25 @@
 
 const mri = require('mri')
 
-const supportsColorOutput = () => {
-  if (process.env.NO_COLOR) return false
-  if (process.env.FORCE_COLOR === '0') return false
-
-  if (process.stdout && typeof process.stdout.hasColors === 'function') {
-    return process.stdout.hasColors()
-  }
-
-  return Boolean(process.stdout && process.stdout.isTTY)
-}
+const hasColorizedOutput = () =>
+  !process.env.NO_COLOR &&
+  process.env.FORCE_COLOR !== '0' &&
+  Boolean(process.stdout.hasColors?.())
 
 const parsed = mri(process.argv.slice(2), {
   alias: { H: 'header' },
-  boolean: ['copy', 'json', 'jsonFull', 'pretty'],
+  boolean: ['copy', 'json', 'json-full', 'pretty'],
   string: ['header'],
   default: {
     apiKey: process.env.MICROLINK_API_KEY,
-    pretty: supportsColorOutput(),
+    pretty: hasColorizedOutput(),
     copy: false,
     json: false,
-    jsonFull: false
+    'json-full': false
   }
 })
 
-const { _, header, 'json-full': jsonFullDashed, ...flags } = parsed
-
-flags.jsonFull = Boolean(flags.jsonFull || jsonFullDashed)
+const { _, header, ...flags } = parsed
 
 const parseHeaders = raw => {
   if (!raw) return {}
