@@ -11,7 +11,7 @@ test('serialize request and response payload', t => {
       requestOptions: { headers: { 'x-test': '1' }, responseType: 'json' },
       response: {
         statusCode: 200,
-        headers: { 'content-type': 'application/json' },
+        headers: new Headers({ 'content-type': 'application/json' }),
         url: 'https://api.microlink.io',
         body: { status: 'success' }
       }
@@ -61,7 +61,7 @@ test('mask api key by default', t => {
         responseType: 'json'
       },
       response: {
-        headers: {}
+        headers: new Headers()
       }
     })
   )
@@ -78,7 +78,7 @@ test('show full api key in full mode', t => {
         responseType: 'json'
       },
       response: {
-        headers: {}
+        headers: new Headers()
       },
       full: true
     })
@@ -93,7 +93,7 @@ test('serialize minified payload when pretty is false', t => {
     requestOptions: { headers: {} },
     response: {
       statusCode: 200,
-      headers: { 'content-type': 'application/json' },
+      headers: new Headers({ 'content-type': 'application/json' }),
       url: 'https://api.microlink.io',
       body: { status: 'success' }
     },

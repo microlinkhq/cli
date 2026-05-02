@@ -1,8 +1,6 @@
 'use strict'
 
-const toJSONHeaders = headers => Object.fromEntries(new Headers(headers))
-
-const humanizeApiKey = apiKey => `${apiKey.substring(0, 5)}…`
+const { humanizeApiKey, toPlainHeaders, stringify } = require('./util')
 
 module.exports = ({
   requestUrl,
@@ -18,7 +16,7 @@ module.exports = ({
     headers['x-api-key'] = humanizeApiKey(headers['x-api-key'])
   }
 
-  return JSON.stringify(
+  return stringify(
     {
       request: {
         url: requestUrl,
@@ -27,10 +25,9 @@ module.exports = ({
       },
       response: {
         ...response,
-        headers: toJSONHeaders(response.headers)
+        headers: toPlainHeaders(response.headers)
       }
     },
-    null,
-    pretty ? 2 : 0
+    { pretty }
   )
 }

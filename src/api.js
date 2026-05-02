@@ -6,13 +6,13 @@ require('update-notifier')({ pkg: require('../package.json') }).notify()
 
 const getContentType = require('@kikobeats/content-type')
 const { URLSearchParams } = require('url')
-const clipboardy = require('clipboardy')
 const mql = require('@microlink/mql')
 const prettyMs = require('pretty-ms')
 const temp = require('temperment')
 const fs = require('fs')
 const os = require('os')
 
+const { toClipboard, toPlainHeaders } = require('./util')
 const { gray, green } = require('./colors')
 const printJson = require('./print-json')
 const printText = require('./print-text')
@@ -23,19 +23,23 @@ const microlinkUrl = () =>
 
 const normalizeInput = input => {
   if (!input) return input
-  ;[
+  let normalized = input
+  const sanitizers = [
     microlinkUrl,
     () => require('is-local-address/ipv4').regex,
     () => require('is-local-address/ipv6').regex
-  ].forEach(regex => {
-    return (input = input.replace(regex(), ''))
-  })
-  return input.replace(/^\??url=/, '')
+  ]
+
+  for (const createRegex of sanitizers) {
+    normalized = normalized.replace(createRegex(), '')
+  }
+
+  return normalized.replace(/^\??url=/, '')
 }
 
 const getInput = input => {
   const collection = input.length === 1 ? input[0].split(os.EOL) : input
-  return collection.reduce((acc, item) => acc + item.trim(), '')
+  return collection.map(item => item.trim()).join('')
 }
 
 const toPlainObject = input => Object.fromEntries(new URLSearchParams(input))
@@ -56,10 +60,14 @@ const fetch = async (cli, gotOpts) => {
   const spinner = printText.spinner()
   const shouldSpin = !isJson && pretty
 
-  const mergedGotOpts =
-    Object.keys(cli.headers).length > 0
-      ? { ...gotOpts, headers: { ...gotOpts.headers, ...cli.headers } }
-      : gotOpts
+  let mergedGotOpts = gotOpts
+  if (Object.keys(cli.headers).length > 0) {
+    mergedGotOpts = {
+      ...gotOpts,
+      headers: { ...gotOpts.headers, ...cli.headers }
+    }
+  }
+
   const [requestUrl, requestOptions] = mql.getApiUrl(
     url,
     mqlOpts,
@@ -68,45 +76,43 @@ const fetch = async (cli, gotOpts) => {
 
   try {
     if (shouldSpin) spinner.start()
+
     const start = Date.now()
-    const mqlResponse = isJson
-      ? await mql(url, mqlOpts, mergedGotOpts)
-      : await mql.buffer(url, mqlOpts, mergedGotOpts)
+    const request = isJson ? mql : mql.buffer
+    const mqlResponse = await request(url, mqlOpts, mergedGotOpts)
     const duration = Date.now() - start
-    const response = isJson
-      ? printJson({
+
+    let response = mqlResponse
+    if (isJson) {
+      response = printJson({
         requestUrl,
         requestOptions,
         response: mqlResponse.response,
         full: jsonFull,
         pretty
       })
-      : mqlResponse
-    if (shouldSpin) spinner.stop()
+    }
+
     return { response, duration, flags: { copy, pretty, json: isJson } }
   } catch (error) {
-    if (shouldSpin) spinner.stop()
     error.flags = cli.flags
     throw error
+  } finally {
+    if (shouldSpin) spinner.stop()
   }
 }
 
 const render = ({ response, duration, flags }) => {
   const { headers, requestUrl, url: responseUrl, body } = response
+
   if (flags.json) {
-    if (flags.copy) clipboardy.writeSync(response)
+    if (flags.copy) toClipboard(JSON.parse(response), flags)
     if (!flags.pretty) return console.log(response)
-    try {
-      return printText.json(JSON.parse(response), { color: true })
-    } catch (error) {
-      return console.log(response)
-    }
+
+    return printText.json(JSON.parse(response), { color: true })
   }
 
-  const plainHeaders =
-    headers && typeof headers.entries === 'function'
-      ? Object.fromEntries(headers.entries())
-      : headers
+  const plainHeaders = toPlainHeaders(headers)
 
   const bodyBuffer = Buffer.isBuffer(body) ? body : Buffer.from(body)
   const bodyText = bodyBuffer.toString()
@@ -118,32 +124,21 @@ const render = ({ response, duration, flags }) => {
   const serverTiming = plainHeaders['server-timing']
   const id = plainHeaders['x-request-id']
 
-  const printMode = (() => {
-    if (bodyText.startsWith('data:')) return 'base64'
-    if (contentType !== 'application/json') return 'image'
-  })()
-
-  switch (printMode) {
-    case 'base64': {
-      const extension = contentType
-        ? contentType.split('/')[1].split(';')[0]
-        : 'png'
-      const filepath = temp.file({ extension })
-      fs.writeFileSync(filepath, bodyText.split(',')[1], 'base64')
-      printText.image(filepath)
-      break
-    }
-    case 'image':
-      printText.image(bodyBuffer)
-      console.log()
-      break
-    default: {
-      const isText = contentType === 'text/plain'
-      const isHtml = contentType === 'text/html'
-      const output = isText || isHtml ? bodyText : JSON.parse(bodyText)
-      printText.json(output, flags)
-      break
-    }
+  if (bodyText.startsWith('data:')) {
+    const extension = contentType
+      ? contentType.split('/')[1].split(';')[0]
+      : 'png'
+    const filepath = temp.file({ extension })
+    fs.writeFileSync(filepath, bodyText.split(',')[1], 'base64')
+    printText.image(filepath)
+  } else if (contentType !== 'application/json') {
+    printText.image(bodyBuffer)
+    console.log()
+  } else {
+    const isText = contentType === 'text/plain'
+    const isHtml = contentType === 'text/html'
+    const output = isText || isHtml ? bodyText : JSON.parse(bodyText)
+    printText.json(output, flags)
   }
 
   const edgeCacheStatus = plainHeaders['cf-cache-status']
@@ -193,13 +188,7 @@ const render = ({ response, duration, flags }) => {
   console.error('      ', printText.keyValue(green('id'), id))
 
   if (flags.copy) {
-    let copiedValue
-    try {
-      copiedValue = JSON.parse(bodyText)
-    } catch (err) {
-      copiedValue = bodyText
-    }
-    clipboardy.writeSync(JSON.stringify(copiedValue, null, 2))
+    toClipboard(JSON.parse(bodyText), flags)
     console.error(`\n   ${gray('Copied to clipboard!')}`)
   }
 }
