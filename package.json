@@ -2,7 +2,7 @@
   "name": "@microlink/cli",
   "description": "Interacting with Microlink API from your terminal.",
   "homepage": "https://github.com/microlinkhq/cli",
-  "version": "2.1.54",
+  "version": "2.1.55",
   "main": "src/index.js",
   "bin": {
     "microlink": "bin/microlink",
