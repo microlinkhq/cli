@@ -13,9 +13,18 @@ Flags
       white('$MICROLINK_API_KEY')
     )}`
   )}
-  ${gray(`--colors       colorize output (default is ${code(white('true'))}`)}
   ${gray(
     `--copy         copy output to clipboard (default is ${code(
+      white('false')
+    )}).`
+  )}
+  ${gray(
+    `--json         print request & response payload as JSON (API key masked, default is ${code(
+      white('false')
+    )}).`
+  )}
+  ${gray(
+    `--json-full    print request & response payload as JSON including full API key (default is ${code(
       white('false')
     )}).`
   )}
@@ -30,6 +39,8 @@ Flags
 Examples
   ${gray('microlink https://microlink.io&palette')}
   ${gray('microlink https://microlink.io&palette --no-pretty')}
+  ${gray('microlink https://microlink.io&palette --json')}
+  ${gray('microlink https://microlink.io&palette --json-full')}
   ${gray('microlink https://microlink.io&palette --api-key=MyApiKey')}
   ${gray("microlink https://example.com -H 'x-user-cookie: 1'")}
 `

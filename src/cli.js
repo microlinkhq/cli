@@ -1,30 +1,22 @@
 'use strict'
 
 const mri = require('mri')
+const { hasColorizedOutput, parseHeaders } = require('./util')
 
-const { _, header, ...flags } = mri(process.argv.slice(2), {
+const parsed = mri(process.argv.slice(2), {
   alias: { H: 'header' },
-  boolean: ['color', 'copy', 'pretty'],
+  boolean: ['copy', 'json', 'json-full', 'pretty'],
   string: ['header'],
   default: {
     apiKey: process.env.MICROLINK_API_KEY,
-    pretty: true,
-    color: true,
-    copy: false
+    pretty: hasColorizedOutput(),
+    copy: false,
+    json: false,
+    'json-full': false
   }
 })
 
-const parseHeaders = raw => {
-  if (!raw) return {}
-  const entries = Array.isArray(raw) ? raw : [raw]
-  const headers = {}
-  for (const entry of entries) {
-    const idx = entry.indexOf(':')
-    if (idx === -1) continue
-    headers[entry.slice(0, idx).trim().toLowerCase()] = entry.slice(idx + 1).trim()
-  }
-  return headers
-}
+const { _, header, ...flags } = parsed
 
 const headers = parseHeaders(header)
 
