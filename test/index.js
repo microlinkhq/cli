@@ -5,13 +5,12 @@ const test = require('ava')
 
 const { loadFresh, withModuleMocks } = require('./helpers/module-mocks')
 
-test.serial('index exports cli, api, exit and print modules', async t => {
+test.serial('index exports cli, api and exit modules', async t => {
   const exports = await withModuleMocks(
     {
       './cli': { name: 'cli' },
       './api': { name: 'api' },
-      './exit': { name: 'exit' },
-      './print': { name: 'print' }
+      './exit': { name: 'exit' }
     },
     async () => loadFresh(path.join(process.cwd(), 'src/index.js'))
   )
@@ -19,7 +18,6 @@ test.serial('index exports cli, api, exit and print modules', async t => {
   t.deepEqual(exports, {
     cli: { name: 'cli' },
     api: { name: 'api' },
-    exit: { name: 'exit' },
-    print: { name: 'print' }
+    exit: { name: 'exit' }
   })
 })
