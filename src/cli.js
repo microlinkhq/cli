@@ -16,7 +16,9 @@ const parsed = mri(process.argv.slice(2), {
   }
 })
 
-const { _, header, ...flags } = parsed
+const { _, header, 'api-key': apiKey, ...flags } = parsed
+
+if (apiKey !== undefined) flags.apiKey = apiKey
 
 const headers = parseHeaders(header)
 

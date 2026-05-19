@@ -52,6 +52,42 @@ test.serial('cli parses args, flags and headers', async t => {
   }
 })
 
+test.serial('cli normalizes api-key flag to apiKey', async t => {
+  const originalArgv = process.argv
+  const initialApiKey = process.env.MICROLINK_API_KEY
+
+  process.argv = [
+    'node',
+    'microlink',
+    'https://www.producthunt.com/products/notion',
+    '--api-key',
+    'f00'
+  ]
+  process.env.MICROLINK_API_KEY = 'api-key-test'
+
+  try {
+    await withModuleMocks(
+      {
+        './util': {
+          hasColorizedOutput: () => false,
+          parseHeaders: () => ({})
+        }
+      },
+      async () => {
+        const cli = loadFresh(path.join(process.cwd(), 'src/cli.js'))
+
+        t.false(Object.prototype.hasOwnProperty.call(cli.flags, 'api-key'))
+        t.is(cli.flags.apiKey, 'f00')
+      }
+    )
+  } finally {
+    process.argv = originalArgv
+
+    if (initialApiKey === undefined) delete process.env.MICROLINK_API_KEY
+    else process.env.MICROLINK_API_KEY = initialApiKey
+  }
+})
+
 test.serial('cli showHelp prints help and exits 0', async t => {
   const originalArgv = process.argv
   const originalLog = console.log
