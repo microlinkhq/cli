@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 2.1.56 (2026-05-19)
+
+
+### Bug Fixes
+
+* api key ([5eafd0f](https://github.com/microlinkhq/cli/commit/5eafd0f363b729122c7de9014a3f1ac07b8ef247))
+
 ### 2.1.55 (2026-05-02)
 
 ### 2.1.54 (2026-04-14)
