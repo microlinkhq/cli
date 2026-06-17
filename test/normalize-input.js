@@ -26,3 +26,77 @@ test('clean API endpoint', t => {
     'https://example.com&force&ping.url=false'
   )
 })
+
+test('endpoint with trailing slash', t => {
+  t.is(
+    normalizeInput(
+      'https://api.microlink.io/?url=https://example.com&embed=markdown'
+    ),
+    'https://example.com&embed=markdown'
+  )
+})
+
+test('params before url= are preserved (url lifted to front)', t => {
+  t.is(
+    normalizeInput(
+      'https://api.microlink.io/?data.markdown.attr=markdown&embed=markdown&url=https://example.com'
+    ),
+    'https://example.com&data.markdown.attr=markdown&embed=markdown'
+  )
+})
+
+test('bare target URL is left untouched', t => {
+  t.is(
+    normalizeInput('https://www.msn.com/en-gb/news/ar-AA23ijAE'),
+    'https://www.msn.com/en-gb/news/ar-AA23ijAE'
+  )
+})
+
+test('endpoint host is stripped when passed (microlink-dev / microlink-next)', t => {
+  t.is(
+    normalizeInput(
+      'http://localhost:3000/?data.markdown.attr=markdown&url=https://example.com',
+      'http://localhost:3000'
+    ),
+    'https://example.com&data.markdown.attr=markdown'
+  )
+  t.is(
+    normalizeInput(
+      'https://next.microlink.io/?url=https://example.com&embed=markdown',
+      'https://next.microlink.io'
+    ),
+    'https://example.com&embed=markdown'
+  )
+})
+
+test('a pasted *.microlink.io URL is normalized by any binary', t => {
+  // e.g. pasting a prod api URL into microlink-dev (endpoint = localhost)
+  t.is(
+    normalizeInput(
+      'https://api.microlink.io/?url=https://example.com&embed=markdown',
+      'http://localhost:3000'
+    ),
+    'https://example.com&embed=markdown'
+  )
+})
+
+test('endpoint host is not stripped from a host that merely starts with it', t => {
+  // endpoint `localhost:3000` must not strip the prefix of `localhost:30001`
+  // (a different port), which would leave corrupted `1/?url=…` remainder text
+  t.is(
+    normalizeInput(
+      'http://localhost:30001/?url=https://example.com',
+      'http://localhost:3000'
+    ),
+    'http://localhost:30001/?url=https://example.com'
+  )
+})
+
+test('endpoint host is NOT stripped by an unrelated binary', t => {
+  // a localhost input given to the prod binary (no endpoint) stays as a bare
+  // target URL — localhost stripping is scoped to the binary that targets it
+  t.is(
+    normalizeInput('http://localhost:3000/?url=https://example.com'),
+    'http://localhost:3000/?url=https://example.com'
+  )
+})
