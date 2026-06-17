@@ -21,20 +21,63 @@ const exit = require('./exit')
 const microlinkUrl = () =>
   /^https?:\/\/((?!fonts|geolocation\.)[a-z0-9-]+\.)+microlink\.io/
 
-const normalizeInput = input => {
+// Leading-host matcher for the binary's own endpoint (e.g. `microlink-dev` →
+// `http://localhost:3000`, `microlink-next` → `https://next.microlink.io`).
+// Each binary sets its own `cli.flags.endpoint`, so the host we strip is driven
+// by that flag rather than a blanket list shared across every executable.
+const endpointUrl = endpoint => {
+  if (!endpoint) return null
+  let host
+  try {
+    ;({ host } = new URL(endpoint))
+  } catch {
+    return null
+  }
+  // Require a host boundary (path/query/fragment or end-of-string) after the
+  // host so a longer host that merely *starts with* it isn't matched (e.g.
+  // endpoint `localhost:3000` must not strip a prefix of `localhost:30001`).
+  const escapedHost = host.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return new RegExp(`^https?://${escapedHost}(?=[/?#]|$)`)
+}
+
+const normalizeInput = (input, endpoint) => {
   if (!input) return input
   let normalized = input
-  const sanitizers = [
-    microlinkUrl,
-    () => require('is-local-address/ipv4').regex,
-    () => require('is-local-address/ipv6').regex
-  ]
 
-  for (const createRegex of sanitizers) {
-    normalized = normalized.replace(createRegex(), '')
+  // Recognize API-shaped input (full endpoint URL, or a bare `?url=`/`url=`
+  // query string) so a bare target URL is left untouched.
+  let isApiInput = /^\??url=/.test(input) || input.startsWith('?')
+
+  // Always strip a canonical `*.microlink.io` host (users paste these into any
+  // binary), plus the binary's own endpoint host when it isn't on microlink.io.
+  const sanitizers = [microlinkUrl()]
+  const endpointRegex = endpointUrl(endpoint)
+  if (endpointRegex) sanitizers.push(endpointRegex)
+
+  for (const regex of sanitizers) {
+    const next = normalized.replace(regex, '')
+    if (next !== normalized) {
+      isApiInput = true
+      normalized = next
+    }
   }
 
-  return normalized.replace(/^\??url=/, '')
+  if (!isApiInput) return normalized
+
+  // Drop the leftover path/query separators after the host (e.g. `/?url=…`).
+  normalized = normalized.replace(/^\/+/, '').replace(/^\?/, '')
+
+  // Lift the `url=` param to the front so the caller's `url=${…}`
+  // reconstruction keeps every other param intact regardless of their order
+  // (e.g. `data.markdown.attr=markdown&embed=markdown&url=…`).
+  const params = normalized.split('&')
+  const urlIndex = params.findIndex(p => p === 'url' || p.startsWith('url='))
+  if (urlIndex === -1) return normalized
+
+  const urlValue = params[urlIndex].replace(/^url=?/, '')
+  return [urlValue, ...params.filter((_, index) => index !== urlIndex)].join(
+    '&'
+  )
 }
 
 const getInput = input => {
@@ -55,7 +98,9 @@ const fetch = async (cli, gotOpts) => {
   } = cli.flags
   const isJson = json || jsonFull
   const input = getInput(cli.input, endpoint)
-  const { url, ...queryParams } = toPlainObject(`url=${normalizeInput(input)}`)
+  const { url, ...queryParams } = toPlainObject(
+    `url=${normalizeInput(input, endpoint)}`
+  )
   const mqlOpts = { endpoint, ...queryParams, ...flags }
   const spinner = printText.spinner()
   const shouldSpin = !isJson && pretty
