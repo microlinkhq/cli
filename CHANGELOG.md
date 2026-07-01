@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### 2.1.59 (2026-07-01)
+
+
+### Bug Fixes
+
+* treat microlink.io content hosts as valid target URLs ([#116](https://github.com/microlinkhq/cli/issues/116)) ([6544886](https://github.com/microlinkhq/cli/commit/6544886b4e0bb55825b833b5e442a128bd336e4d))
+
 ### 2.1.58 (2026-06-18)
 
 ### 2.1.57 (2026-06-17)
