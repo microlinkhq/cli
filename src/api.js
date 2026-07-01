@@ -48,17 +48,22 @@ const normalizeInput = (input, endpoint) => {
   // query string) so a bare target URL is left untouched.
   let isApiInput = /^\??url=/.test(input) || input.startsWith('?')
 
-  // Always strip a canonical `*.microlink.io` host (users paste these into any
-  // binary), plus the binary's own endpoint host when it isn't on microlink.io.
-  const sanitizers = [microlinkUrl()]
-  const endpointRegex = endpointUrl(endpoint)
-  if (endpointRegex) sanitizers.push(endpointRegex)
+  // Host stripping only applies to an actual API request, which always carries a
+  // `url=` query. A bare target URL — even on a microlink.io content host such as
+  // cdn.microlink.io — has none, so its host must survive untouched.
+  if (/(?:^|[?&])url=/.test(input)) {
+    // Strip a canonical `*.microlink.io` host (users paste these into any
+    // binary), plus the binary's own endpoint host when it isn't on microlink.io.
+    const sanitizers = [microlinkUrl()]
+    const endpointRegex = endpointUrl(endpoint)
+    if (endpointRegex) sanitizers.push(endpointRegex)
 
-  for (const regex of sanitizers) {
-    const next = normalized.replace(regex, '')
-    if (next !== normalized) {
-      isApiInput = true
-      normalized = next
+    for (const regex of sanitizers) {
+      const next = normalized.replace(regex, '')
+      if (next !== normalized) {
+        isApiInput = true
+        normalized = next
+      }
     }
   }
 
