@@ -52,6 +52,23 @@ test('bare target URL is left untouched', t => {
   )
 })
 
+test('a microlink.io content host is a valid target, not an API host', t => {
+  // cdn.microlink.io (and other content hosts) carry no `url=` param, so the
+  // host must not be stripped as if it were an API endpoint
+  t.is(
+    normalizeInput('https://cdn.microlink.io/file-examples/sample.docx'),
+    'https://cdn.microlink.io/file-examples/sample.docx'
+  )
+  // even given a dev endpoint, and with appended flags
+  t.is(
+    normalizeInput(
+      'https://cdn.microlink.io/file-examples/sample.docx&pdf=true&meta=false',
+      'http://localhost:3000'
+    ),
+    'https://cdn.microlink.io/file-examples/sample.docx&pdf=true&meta=false'
+  )
+})
+
 test('endpoint host is stripped when passed (microlink-dev / microlink-next)', t => {
   t.is(
     normalizeInput(
