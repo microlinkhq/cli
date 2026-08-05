@@ -1,6 +1,6 @@
 {
   "name": "@microlink/cli",
-  "description": "Interacting with Microlink API from your terminal.",
+  "description": "Command-line client for the Microlink API — screenshots, metadata, and PDF from your terminal.",
   "homepage": "https://github.com/microlinkhq/cli",
   "version": "2.1.61",
   "main": "src/index.js",
@@ -30,7 +30,14 @@
   "keywords": [
     "api",
     "cli",
-    "microlink"
+    "metadata",
+    "microlink",
+    "mql",
+    "pdf",
+    "preview",
+    "scrape",
+    "screenshot",
+    "terminal"
   ],
   "dependencies": {
     "@kikobeats/content-type": "~1.0.4",
